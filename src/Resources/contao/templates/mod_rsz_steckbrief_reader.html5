@@ -1,0 +1,72 @@
+<?php
+$felder = array("wohnort", "hobbies", "klettert_seit", "best_competition_results", "schwerste_rotpunktroute_indoor", "schwerste_boulderroute_indoor");
+$felder2 = array("lieblingsklettergebiet", "sponsoren", "ziele", "leitsatz");
+$GLOBALS['TL_LANG']['tl_rsz_steckbrief']['wohnort'] = ['Wohnort', ''];
+?>
+
+<?php $this->extend('block_searchable'); ?>
+
+<?php $this->block('content'); ?>
+
+<h1><?= $this->name ?></h1>
+<?php if(count($this->arrImages) > 0): ?>
+<ul class="row">
+    <?php foreach ($this->arrImages as $image): ?>
+    <li class="col-12 col-sm-6 col-md-4 col-lg-3 mb-4">
+        <figure class="image_container">
+            <a href="<?= urlencode($image["imageSrc"]) ?>" data-lightbox="member-profile" title="<?= $image["caption"] ?>">
+            {{image::<?= $image["imageSrc"] ?>?mode=crop&width=700&height=700&rel=data-lightbox }}
+            </a>
+        </figure>
+    </li>
+    <?php endforeach; ?>
+</ul>
+<?php endif; ?>
+
+<h2>Kurzer Steckbrief:</h2>
+<table class="table">
+    <?php foreach ($felder as $key): ?>
+        <?php if ($this->{$key}!=""): ?>
+        <tr>
+            <td class="description"><strong><?= $this->trans('tl_rsz_steckbrief.' . $key . '.0') ?>:</strong></td>
+            <td><?= nl2br($this->{$key}) ?></td>
+        </tr>
+        <?php endif; ?>
+    <?php endforeach; ?>
+
+    <?php if ($this->schwerste_route_gebiet != ""): ?>
+    <tr>
+        <td class="description"><strong>Schwerste Route outdoor (rotpunkt): </strong></td>
+        <td><?= $this->schwerste_route_gebiet .", ". $this->schwerste_route_routenname .", " . $this->schwerste_route_difficulty ?></td>
+    </tr>
+    <?php endif;
+
+    if ($this->schwerster_boulder_gebiet != ""): ?>
+    <tr>
+        <td class="description"><strong>Schwerster Boulder outdoor: </strong></td>
+        <td><?= $this->schwerster_boulder_gebiet .", ". $this->schwerster_boulder_routenname .", " . $this->schwerster_boulder_difficulty ?></td>
+    </tr>
+    <?php endif; ?>
+
+    <?php foreach ($felder2 as $key): ?>
+    <?php if ($this->{$key}!=""): ?>
+    <tr>
+        <td class="description"><strong><?= $this->trans('tl_rsz_steckbrief.' . $key . '.0') ?>: </strong></td>
+        <td><?= nl2br($this->{$key}) ?></td>
+    </tr>
+    <?php endif; ?>
+    <?php endforeach; ?>
+
+</table>
+
+<div class="row">
+    <?php foreach($this->arrVideos as $video): ?>
+    <div class="col-12 col-md-6" style="margin-bottom:1rem">
+        {{bootstrapResponsiveYoutubeEmbed::<?= $video ?>}}
+    </div>
+    <?php endforeach; ?>
+</div>
+
+<p class="last_update"><br><br><br>[last update: <?= \Contao\Date::parse('l, d. F Y', $this->tstamp) ?>]</p>
+
+<?php $this->endblock(); ?>
