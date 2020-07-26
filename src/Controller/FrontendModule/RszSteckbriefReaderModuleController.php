@@ -41,7 +41,7 @@ class RszSteckbriefReaderModuleController extends AbstractFrontendModuleControll
     private $projectDir;
 
     /** @var string */
-    private $strRszSteckbriefAvatarSrc = 'bundles/markocupicrszsteckbrief/avatar.png';
+    private $strRszSteckbriefAvatarSrc;
 
     /**
      * RszSteckbriefReaderModuleController constructor.
@@ -134,7 +134,7 @@ class RszSteckbriefReaderModuleController extends AbstractFrontendModuleControll
         $multiSRC = unserialize($objSteckbrief->multiSRC);
         $orderSRC = unserialize($objSteckbrief->orderSRC);
         $images = [];
-        $i = 0;
+        
 
         // Return if there are no files
         if (!empty($multiSRC && is_array($multiSRC)))
@@ -153,7 +153,7 @@ class RszSteckbriefReaderModuleController extends AbstractFrontendModuleControll
                     $arrImage['uuid'] = $filesModel->uuid;
                     $arrImage['imageSrc'] = $filesModel->path;
                     $images[$filesModel->path] = $arrImage;
-                    $i++;
+                    
                 }
             }
         }
@@ -191,7 +191,7 @@ class RszSteckbriefReaderModuleController extends AbstractFrontendModuleControll
             }
         }
 
-        // Finally store the image captions in a array
+        // Finally store the image captions in an array
         $imageCaption = explode('***', $objSteckbrief->image_description);
         foreach ($images as $k => $v)
         {
@@ -199,8 +199,6 @@ class RszSteckbriefReaderModuleController extends AbstractFrontendModuleControll
         }
 
         $template->arrImages = $images;
-        $arrImageContainer = [];
-        $template->imageContainer = $arrImageContainer;
 
         return $template->getResponse();
     }
