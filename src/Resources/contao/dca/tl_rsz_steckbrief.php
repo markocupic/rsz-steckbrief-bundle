@@ -100,14 +100,15 @@ $GLOBALS['TL_DCA']['tl_rsz_steckbrief'] = [
             'sql'       => "blob NULL",
         ],
         'orderSRC'                       => [
-            'sql'   => "blob NULL"
+            'sql' => "blob NULL"
         ],
         'image_description'              => [
-            'exclude'   => true,
-            'flag'      => 1,
-            'inputType' => 'textarea',
-            'eval'      => ['allowHtml' => false],
-            'sql'       => "text NOT NULL",
+            'exclude'     => true,
+            'flag'        => 1,
+            'inputType'   => 'textarea',
+            'explanation' => &$GLOBALS['TL_LANG']['tl_rsz_steckbrief']['image_description_explanation'],
+            'eval'        => ['allowHtml' => false],
+            'sql'         => "text NOT NULL",
         ],
         'klettert_seit'                  => [
             'exclude'   => true,
