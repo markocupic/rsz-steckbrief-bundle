@@ -23,6 +23,7 @@ use Contao\FilesModel;
 use Contao\Input;
 use Contao\ModuleModel;
 use Contao\PageModel;
+use Contao\StringUtil;
 use Contao\System;
 use Contao\Template;
 use Contao\UserModel;
@@ -154,6 +155,9 @@ class RszSteckbriefReaderModuleController extends AbstractFrontendModuleControll
         // Load language file
         $systemAdapter->loadLanguageFile('tl_rsz_steckbrief');
 
+        /** @var StringUtil $stringUtilAdapter */
+        $stringUtilAdapter = $this->get('contao.framework')->getAdapter(StringUtil::class);
+
         // Get name and city from tl_user
         $objUser = $this->objRszSteckbrief->getRelated('pid');
 
@@ -174,12 +178,12 @@ class RszSteckbriefReaderModuleController extends AbstractFrontendModuleControll
             $template->arrVideos = array_values(explode(',', $arrSteckbrief['video_integration']));
         }
 
-        $multiSRC = unserialize($this->objRszSteckbrief->multiSRC);
-        $orderSRC = unserialize($this->objRszSteckbrief->orderSRC);
+        $multiSRC = $stringUtilAdapter->deserialize($this->objRszSteckbrief->multiSRC);
+        $orderSRC = $stringUtilAdapter->deserialize($this->objRszSteckbrief->orderSRC);
         $images = [];
 
         // Return if there are no files
-        if (!empty($multiSRC && is_array($multiSRC)))
+        if (!empty($multiSRC) && is_array($multiSRC))
         {
             // Get the file entries from the database
             $filesModel = $filesModelAdapter->findMultipleByUuids($multiSRC);
