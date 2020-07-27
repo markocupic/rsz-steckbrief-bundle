@@ -118,7 +118,7 @@ $GLOBALS['TL_DCA']['tl_rsz_steckbrief'] = [
         'best_competition_results'       => [
             'exclude'   => true,
             'inputType' => 'textarea',
-            'eval'      => ['style' => 'height:7em; width:80%', 'allowHtml' => false, 'tl_class' => 'w50'],
+            'eval'      => ['allowHtml' => false, 'tl_class' => 'clr'],
             'sql'       => "text NOT NULL",
         ],
         'schwerste_rotpunktroute_indoor' => [
@@ -172,31 +172,31 @@ $GLOBALS['TL_DCA']['tl_rsz_steckbrief'] = [
         'lieblingsklettergebiet'         => [
             'exclude'   => true,
             'inputType' => 'textarea',
-            'eval'      => ['style' => 'height:7em; width:80%', 'allowHtml' => false, 'tl_class' => 'w50'],
+            'eval'      => ['allowHtml' => false, 'tl_class' => 'clr'],
             'sql'       => "text NOT NULL",
         ],
         'sponsoren'                      => [
             'exclude'   => true,
             'inputType' => 'textarea',
-            'eval'      => ['style' => 'height:7em; width:80%', 'allowHtml' => false, 'tl_class' => 'w50'],
+            'eval'      => ['style' => 'allowHtml' => false, 'tl_class' => 'clr'],
             'sql'       => "text NOT NULL",
         ],
         'ziele'                          => [
             'exclude'   => true,
             'inputType' => 'textarea',
-            'eval'      => ['style' => 'height:7em; width:80%', 'allowHtml' => false, 'tl_class' => 'w50'],
+            'eval'      => ['allowHtml' => false, 'tl_class' => 'clr'],
             'sql'       => "text NOT NULL",
         ],
         'leitsatz'                       => [
             'exclude'   => true,
             'inputType' => 'textarea',
-            'eval'      => ['style' => 'height:7em; width:80%', 'allowHtml' => false, 'tl_class' => 'w50'],
+            'eval'      => ['allowHtml' => false, 'tl_class' => 'clr'],
             'sql'       => "text NOT NULL",
         ],
         'hobbies'                        => [
             'exclude'   => true,
             'inputType' => 'textarea',
-            'eval'      => ['style' => 'height:7em; width:80%', 'allowHtml' => false, 'tl_class' => 'w50'],
+            'eval'      => ['allowHtml' => false, 'tl_class' => 'clr'],
             'sql'       => "text NOT NULL",
         ],
         'video_integration'              => [
@@ -213,11 +213,6 @@ $GLOBALS['TL_DCA']['tl_rsz_steckbrief'] = [
  */
 class tl_rsz_steckbrief extends Backend
 {
-
-    /**
-     * @var array
-     */
-    public $arrValidExtensions = ["jpg", "jpeg", "png"];
 
     /**
      * tl_rsz_steckbrief constructor.
