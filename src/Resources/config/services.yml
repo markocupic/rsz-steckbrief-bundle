@@ -3,6 +3,8 @@ services:
 
   # Contao frontend module Markocupic\RszSteckbriefBundle\Controller\FrontendModule\RszSteckbriefListingModuleController
   Markocupic\RszSteckbriefBundle\Controller\FrontendModule\RszSteckbriefListingModuleController:
+    arguments:
+    - '%kernel.project_dir%'
     tags:
     - { name: contao.frontend_module, category: rsz_frontend_modules, template: mod_rsz_steckbrief_listing, type: rsz_steckbrief_listing_module }
     - { name: container.service_subscriber }
@@ -13,6 +15,8 @@ services:
     arguments:
     - '%kernel.project_dir%'
     - '%rsz-steckbrief-avatar-path%'
+    - '@request_stack'
+    - '@contao.routing.scope_matcher'
     tags:
     - { name: contao.frontend_module, category: rsz_frontend_modules, template: mod_rsz_steckbrief_reader, type: rsz_steckbrief_reader_module }
     - { name: container.service_subscriber }

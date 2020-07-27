@@ -22,9 +22,10 @@ use Contao\PageModel;
 use Contao\StringUtil;
 use Contao\Template;
 use Contao\UserModel;
+use Contao\Validator;
+use Markocupic\RszSteckbriefBundle\Model\RszSteckbriefModel;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 /**
  * Class RszSteckbriefListingModuleController
@@ -33,13 +34,16 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
 class RszSteckbriefListingModuleController extends AbstractFrontendModuleController
 {
 
+    /** @var string */
+    private $projectDir;
+
     /**
      * RszSteckbriefListingModuleController constructor.
-     * @param SessionInterface $session
+     * @param string $projectDir
      */
-    public function __construct(SessionInterface $session)
+    public function __construct(string $projectDir)
     {
-        $this->session = $session;
+        $this->projectDir = $projectDir;
     }
 
     /**
@@ -64,13 +68,7 @@ class RszSteckbriefListingModuleController extends AbstractFrontendModuleControl
     public static function getSubscribedServices(): array
     {
         $services = parent::getSubscribedServices();
-
         $services['contao.framework'] = ContaoFramework::class;
-        //$services['database_connection'] = Connection::class;
-        //$services['contao.routing.scope_matcher'] = ScopeMatcher::class;
-        //$services['security.helper'] = Security::class;
-        //$services['translator'] = TranslatorInterface::class;
-
         return $services;
     }
 
@@ -84,13 +82,26 @@ class RszSteckbriefListingModuleController extends AbstractFrontendModuleControl
      * @param ModuleModel $model
      * @param Request $request
      * @return null|Response
+     * @throws \Exception
      */
     protected function getResponse(Template $template, ModuleModel $model, Request $request): ?Response
     {
         /** @var Database $databaseAdapter */
         $databaseAdapter = $this->get('contao.framework')->getAdapter(Database::class);
 
-        $items = [];
+        /** @var Validator $validatorAdapter */
+        $validatorAdapter = $this->get('contao.framework')->getAdapter(Validator::class);
+
+        /** @var FilesModel $filesModelAdapter */
+        $filesModelAdapter = $this->get('contao.framework')->getAdapter(FilesModel::class);
+
+        /** @var RszSteckbriefModel $rszSteckbriefModel */
+        $rszSteckbriefModel = $this->get('contao.framework')->getAdapter(RszSteckbriefModel::class);
+
+        // Die ganze Tabelle
+        $objJumpTo = PageModel::findByPk($model->rszSteckbriefReaderPage);
+
+        $portraits = [];
 
         $objSteckbrief = $databaseAdapter->getInstance()
             ->prepare("SELECT * FROM tl_steckbriefe WHERE multiSRC != ''")
@@ -98,26 +109,37 @@ class RszSteckbriefListingModuleController extends AbstractFrontendModuleControl
 
         while ($objSteckbrief->next())
         {
-            if (!$this->isAthlete($objSteckbrief->pid) || !$this->isRSZ($objSteckbrief->pid))
+            /** @var UserModel $objUser */
+            if (($objUser = $rszSteckbriefModel->findByPk($objSteckbrief->id)->getRelated('pid')) === null)
+            {
+                continue;
+            }
+
+            if (!$this->isAthlete($objUser) || !$objUser->isRSZ)
             {
                 continue;
             }
 
             $objSteckbrief->multiSRC = unserialize($objSteckbrief->multiSRC);
-            if (!empty($objSteckbrief->multiSRC && is_array($objSteckbrief->multiSRC)))
+            if (!empty($objSteckbrief->multiSRC) && is_array($objSteckbrief->multiSRC))
             {
-                $images = [];
-                foreach ($objSteckbrief->multiSRC as $uuid)
+                if (($objFiles = $filesModelAdapter->findMultipleByUuids($objSteckbrief->multiSRC)) !== null)
                 {
-                    $images[] = ['uuid' => $uuid];
-                }
-                // Custom order
-                if ($objSteckbrief->orderSRC != '')
-                {
-                    $tmp = unserialize($objSteckbrief->orderSRC);
+                    $images = [];
 
-                    if (!empty($tmp) && is_array($tmp))
+                    while ($objFiles->next())
                     {
+                        if ($validatorAdapter->isUuid($objFiles->uuid) && is_file($this->projectDir . '/' . $objFiles->path))
+                        {
+                            $images[] = ['uuid' => $objFiles->uuid];
+                        }
+                    }
+
+                    // Custom order
+                    if (!empty($objSteckbrief->orderSRC) && is_array(unserialize($objSteckbrief->orderSRC)))
+                    {
+                        $tmp = unserialize($objSteckbrief->orderSRC);
+
                         // Remove all values
                         $arrOrder = array_map(function () {
                         }, array_flip($tmp));
@@ -142,60 +164,41 @@ class RszSteckbriefListingModuleController extends AbstractFrontendModuleControl
                         $images = array_values(array_filter($arrOrder));
                         unset($arrOrder);
                     }
+
+                    // Take first image from stack
+                    $image = $images[0];
+
+                    $portraits[] = [
+                        'id'        => $objSteckbrief->id,
+                        'pid'       => $objSteckbrief->pid,
+                        'src'       => FilesModel::findByUuid($image['uuid'])->path,
+                        'userModel' => $objUser,
+                        'href'      => $objJumpTo ? $objJumpTo->getFrontendUrl('/' . $objUser->username) : null,
+                    ];
                 }
-                $image = $images[0];
-                $items[] = [
-                    'id'   => $objSteckbrief->id,
-                    'pid'  => $objSteckbrief->pid,
-                    'src'  => FilesModel::findByUuid($image['uuid'])->path,
-                    'name' => UserModel::findByPk($objSteckbrief->pid)->name,
-                ];
             }
         }
 
-        shuffle($items);
-        $portraits = [];
-        foreach ($items as $item)
-        {
-            $portraits[] = $item;
-        }
-        $template->items = $portraits;
+        // Random order
+        shuffle($portraits);
+
+        $template->portraits = $portraits;
 
         return $template->getResponse();
     }
 
     /**
-     * @param $id
+     * @param UserModel $objUser
      * @return bool
      */
-    public function isAthlete($id): bool
+    protected function isAthlete(UserModel $objUser): bool
     {
-        $objUser = UserModel::findByPk($id);
-        if ($objUser !== null)
+        $arrFunktionen = StringUtil::deserialize($objUser->funktion, true);
+        if (in_array('Athlet', $arrFunktionen))
         {
-            $arrFunktionen = StringUtil::deserialize($objUser->funktion, true);
-            if (in_array('Athlet', $arrFunktionen))
-            {
-                return true;
-            }
+            return true;
         }
-        return false;
-    }
 
-    /**
-     * @param $id
-     * @return bool
-     */
-    public function isRSZ($id): bool
-    {
-        $objUser = UserModel::findByPk($id);
-        if ($objUser !== null)
-        {
-            if ($objUser->isRSZ)
-            {
-                return true;
-            }
-        }
         return false;
     }
 }

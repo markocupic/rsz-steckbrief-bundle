@@ -3,14 +3,18 @@
 <?php $this->block('content'); ?>
 
 <div class="row">
-    <?php foreach($this->items as $item): ?>
+    <?php foreach($this->portraits as $portrait): ?>
     <div class="col-6 col-lg-4">
-        <a href="portrait?uid=<?= $item['pid'] ?>" title="Portrait von <?= $item['name'] ?>">
+        <?php if($portrait['href']): ?>
+        <a href="<?= $portrait['href'] ?>" title="Portrait von <?= $portrait['userModel']->name ?>">
+        <?php endif; ?>
             <figure class="figure image_container w-100">
-                {{image::<?= $item['src'] ?>?width=500&height=500&mode=center_center&class=img-fluid w-100}}
-                <figcaption class="figure-caption"><?= $item['name'] ?></figcaption>
+                {{image::<?= $portrait['src'] ?>?width=500&height=500&mode=center_center&class=img-fluid w-100}}
+                <figcaption class="figure-caption"><?= $portrait['userModel']->name ?></figcaption>
             </figure>
+        <?php if($portrait['href']): ?>
         </a>
+        <?php endif; ?>
     </div>
     <?php endforeach; ?>
 </div>

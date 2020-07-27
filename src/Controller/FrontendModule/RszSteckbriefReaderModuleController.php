@@ -13,23 +13,23 @@ declare(strict_types=1);
 
 namespace Markocupic\RszSteckbriefBundle\Controller\FrontendModule;
 
-use Contao\Controller;
+use Contao\Config;
 use Contao\CoreBundle\Controller\FrontendModule\AbstractFrontendModuleController;
 use Contao\CoreBundle\Exception\PageNotFoundException;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\Routing\ScopeMatcher;
-use Contao\Database;
+use Contao\Environment;
 use Contao\FilesModel;
-use Contao\Image;
 use Contao\Input;
 use Contao\ModuleModel;
 use Contao\PageModel;
+use Contao\System;
 use Contao\Template;
-use Doctrine\DBAL\Connection;
+use Contao\UserModel;
+use Markocupic\RszSteckbriefBundle\Model\RszSteckbriefModel;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Security\Core\Security;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Class RszSteckbriefReaderModuleController
@@ -43,15 +43,28 @@ class RszSteckbriefReaderModuleController extends AbstractFrontendModuleControll
     /** @var string */
     private $strRszSteckbriefAvatarSrc;
 
+    /** @var RequestStack */
+    private $requestStack;
+
+    /** @var ScopeMatcher */
+    private $scopeMatcher;
+
+    /** @var RszSteckbriefModel */
+    private $objRszSteckbrief;
+
     /**
      * RszSteckbriefReaderModuleController constructor.
      * @param string $projectDir
      * @param string $strRszSteckbriefAvatarSrc
+     * @param RequestStack $requestStack
+     * @param ScopeMatcher $scopeMatcher
      */
-    public function __construct(string $projectDir, string $strRszSteckbriefAvatarSrc)
+    public function __construct(string $projectDir, string $strRszSteckbriefAvatarSrc, RequestStack $requestStack, ScopeMatcher $scopeMatcher)
     {
         $this->projectDir = $projectDir;
         $this->strRszSteckbriefAvatarSrc = $strRszSteckbriefAvatarSrc;
+        $this->requestStack = $requestStack;
+        $this->scopeMatcher = $scopeMatcher;
     }
 
     /**
@@ -66,6 +79,49 @@ class RszSteckbriefReaderModuleController extends AbstractFrontendModuleControll
      */
     public function __invoke(Request $request, ModuleModel $model, string $section, array $classes = null, PageModel $page = null): Response
     {
+        /** @var Input $inputAdapter */
+        $inputAdapter = $this->get('contao.framework')->getAdapter(Input::class);
+
+        /** @var Config $configAdapter */
+        $configAdapter = $this->get('contao.framework')->getAdapter(Config::class);
+
+        /** @var UserModel $userModelAdapter */
+        $userModelAdapter = $this->get('contao.framework')->getAdapter(UserModel::class);
+
+        /** @var RszSteckbriefModel $rszSteckbriefModelAdapter */
+        $rszSteckbriefModelAdapter = $this->get('contao.framework')->getAdapter(RszSteckbriefModel::class);
+
+        /** @var Environment $environmentAdapter */
+        $environmentAdapter = $this->get('contao.framework')->getAdapter(Environment::class);
+
+        if ($this->scopeMatcher->isFrontendRequest($this->requestStack->getCurrentRequest()))
+        {
+            $blnShow = false;
+
+            // Set the item from the auto_item parameter
+            if (!isset($_GET['person']) && $configAdapter->get('useAutoItem') && isset($_GET['auto_item']))
+            {
+                $inputAdapter->setGet('person', $inputAdapter->get('auto_item'));
+            }
+
+            if ($inputAdapter->get('person') != '')
+            {
+                $objUser = $userModelAdapter->findByUsername($inputAdapter->get('person'));
+                if ($objUser !== null)
+                {
+                    if (($this->objRszSteckbrief = $rszSteckbriefModelAdapter->findByPid($objUser->id)) !== null)
+                    {
+                        $blnShow = true;
+                    }
+                }
+            }
+
+            if (!$blnShow)
+            {
+                throw new PageNotFoundException('Page not found: ' . $environmentAdapter->get('uri'));
+            }
+        }
+
         return parent::__invoke($request, $model, $section, $classes);
     }
 
@@ -76,13 +132,7 @@ class RszSteckbriefReaderModuleController extends AbstractFrontendModuleControll
     public static function getSubscribedServices(): array
     {
         $services = parent::getSubscribedServices();
-
         $services['contao.framework'] = ContaoFramework::class;
-        $services['database_connection'] = Connection::class;
-        $services['contao.routing.scope_matcher'] = ScopeMatcher::class;
-        $services['security.helper'] = Security::class;
-        $services['translator'] = TranslatorInterface::class;
-
         return $services;
     }
 
@@ -91,39 +141,32 @@ class RszSteckbriefReaderModuleController extends AbstractFrontendModuleControll
      * @param ModuleModel $model
      * @param Request $request
      * @return null|Response
+     * @throws \Exception
      */
     protected function getResponse(Template $template, ModuleModel $model, Request $request): ?Response
     {
-        /** @var Input $inputAdapter */
-        $inputAdapter = $this->get('contao.framework')->getAdapter(Input::class);
+        /** @var System $systemAdapter */
+        $systemAdapter = $this->get('contao.framework')->getAdapter(System::class);
 
-        /** @var Database $databaseAdapter */
-        $databaseAdapter = $this->get('contao.framework')->getAdapter(Database::class);
+        /** @var FilesModel $filesModelAdapter */
+        $filesModelAdapter = $this->get('contao.framework')->getAdapter(FilesModel::class);
 
         // Load language file
-        Controller::loadLanguageFile('tl_rsz_steckbrief');
+        $systemAdapter->loadLanguageFile('tl_rsz_steckbrief');
 
-        if (!is_int((int) $inputAdapter->get('uid')))
-        {
-            throw new PageNotFoundException('Uuid param missing. Page not found.');
-        }
+        // Get name and city from tl_user
+        $objUser = $this->objRszSteckbrief->getRelated('pid');
 
-        $objSteckbrief = $databaseAdapter->getInstance()
-            ->prepare("SELECT * FROM tl_rsz_steckbrief WHERE pid = ?")
-            ->execute($inputAdapter->get('uid'));
+        // Get user model
+        $template->userModel = $objUser;
 
-        $arrSteckbrief = $objSteckbrief->fetchAssoc();
+        $arrSteckbrief = $this->objRszSteckbrief->row();
+        $arrSteckbrief['city'] = $objUser->city;
+
         foreach ($arrSteckbrief as $key => $content)
         {
             $template->{$key} = stripslashes($content);
         }
-
-        // Get name and city from tl_user
-        $objUser = $databaseAdapter->getInstance()
-            ->prepare("SELECT * FROM tl_user WHERE id = ?")
-            ->execute($inputAdapter->get('uid'));
-        $template->name = $objUser->name;
-        $template->wohnort = $objUser->city;
 
         $template->arrVideos = [];
         if ($arrSteckbrief['video_integration'] != '')
@@ -131,16 +174,15 @@ class RszSteckbriefReaderModuleController extends AbstractFrontendModuleControll
             $template->arrVideos = array_values(explode(',', $arrSteckbrief['video_integration']));
         }
 
-        $multiSRC = unserialize($objSteckbrief->multiSRC);
-        $orderSRC = unserialize($objSteckbrief->orderSRC);
+        $multiSRC = unserialize($this->objRszSteckbrief->multiSRC);
+        $orderSRC = unserialize($this->objRszSteckbrief->orderSRC);
         $images = [];
-        
 
         // Return if there are no files
         if (!empty($multiSRC && is_array($multiSRC)))
         {
             // Get the file entries from the database
-            $filesModel = FilesModel::findMultipleByUuids($multiSRC);
+            $filesModel = $filesModelAdapter->findMultipleByUuids($multiSRC);
             if ($filesModel !== null)
             {
                 while ($filesModel->next())
@@ -153,7 +195,6 @@ class RszSteckbriefReaderModuleController extends AbstractFrontendModuleControll
                     $arrImage['uuid'] = $filesModel->uuid;
                     $arrImage['imageSrc'] = $filesModel->path;
                     $images[$filesModel->path] = $arrImage;
-                    
                 }
             }
         }
@@ -192,7 +233,7 @@ class RszSteckbriefReaderModuleController extends AbstractFrontendModuleControll
         }
 
         // Finally store the image captions in an array
-        $imageCaption = explode('***', $objSteckbrief->image_description);
+        $imageCaption = explode('***', $this->objRszSteckbrief->image_description);
         foreach ($images as $k => $v)
         {
             $images[$k]['caption'] = $imageCaption[$k] ? htmlspecialchars(str_replace(chr(10), '', $imageCaption[$k])) : '';
