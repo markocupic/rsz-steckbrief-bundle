@@ -26,6 +26,10 @@
     "contao/core-bundle": "^4.9",
     "markocupic/rsz-benutzerverwaltung-bundle": "dev-master"
   },
+  "require-dev": {
+    "phpunit/phpunit": "^9",
+    "contao/test-case": "^4.2"
+  },
   "autoload": {
     "psr-4": {
       "Markocupic\\RszSteckbriefBundle\\": "src/"
