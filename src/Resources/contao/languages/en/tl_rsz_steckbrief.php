@@ -10,6 +10,13 @@
  */
 
 /**
+ * Operations
+ */
+$GLOBALS['TL_LANG']['tl_rsz_steckbrief']['edit'] = ["Profil mit ID: %s bearbeiten", "Profil mit ID: %s bearbeiten"];
+$GLOBALS['TL_LANG']['tl_rsz_steckbrief']['delete'] = ["Profil mit ID: %s löschen", "Profil mit ID: %s löschen"];
+$GLOBALS['TL_LANG']['tl_rsz_steckbrief']['show'] = ["Profil mit ID: %s ansehen", "Profil mit ID: %s ansehen"];
+
+/**
  * Legends
  */
 $GLOBALS['TL_LANG']['tl_rsz_steckbrief']['publish_legend'] = 'Veröffentlichungs-Eiinnstellungen';
@@ -19,13 +26,6 @@ $GLOBALS['TL_LANG']['tl_rsz_steckbrief']['indoorleistungen'] = 'Meine besten Ind
 $GLOBALS['TL_LANG']['tl_rsz_steckbrief']['outdoorleistungen_routen'] = 'Meine bisher schwierigste Outdoorroute';
 $GLOBALS['TL_LANG']['tl_rsz_steckbrief']['outdoorleistungen_boulders'] = 'Mein bisher schwierigster Outdoorboulder';
 $GLOBALS['TL_LANG']['tl_rsz_steckbrief']['allgemeines'] = 'Allgemeines';
-
-/**
- * Operations
- */
-$GLOBALS['TL_LANG']['tl_rsz_steckbrief']['edit'] = ["Profil mit ID: %s bearbeiten", "Profil mit ID: %s bearbeiten"];
-$GLOBALS['TL_LANG']['tl_rsz_steckbrief']['delete'] = ["Profil mit ID: %s löschen", "Profil mit ID: %s löschen"];
-$GLOBALS['TL_LANG']['tl_rsz_steckbrief']['show'] = ["Profil mit ID: %s ansehen", "Profil mit ID: %s ansehen"];
 
 /**
  * Fields
