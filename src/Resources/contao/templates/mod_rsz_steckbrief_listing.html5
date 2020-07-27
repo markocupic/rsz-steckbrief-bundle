@@ -4,7 +4,7 @@
 
 <div class="row">
     <?php foreach($this->items as $item): ?>
-    <div class="col-6 col-lg-4 wow animated fadeIn">
+    <div class="col-6 col-lg-4">
         <a href="portrait?uid=<?= $item['pid'] ?>" title="Portrait von <?= $item['name'] ?>">
             <figure class="figure image_container w-100">
                 {{image::<?= $item['src'] ?>?width=500&height=500&mode=center_center&class=img-fluid w-100}}
