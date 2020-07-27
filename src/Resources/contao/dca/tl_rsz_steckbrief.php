@@ -178,7 +178,7 @@ $GLOBALS['TL_DCA']['tl_rsz_steckbrief'] = [
         'sponsoren'                      => [
             'exclude'   => true,
             'inputType' => 'textarea',
-            'eval'      => ['style' => 'allowHtml' => false, 'tl_class' => 'clr'],
+            'eval'      => ['allowHtml' => false, 'tl_class' => 'clr'],
             'sql'       => "text NOT NULL",
         ],
         'ziele'                          => [
