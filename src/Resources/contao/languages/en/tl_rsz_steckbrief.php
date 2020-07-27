@@ -9,7 +9,6 @@
  *
  */
 
-
 /**
  * Legends
  */
@@ -32,6 +31,7 @@ $GLOBALS['TL_LANG']['tl_rsz_steckbrief']['show'] = ["Profil mit ID: %s ansehen",
  * Fields
  */
 // Galerie
+$GLOBALS['TL_LANG']['tl_rsz_steckbrief']['aktiv'] = ['Bilder auswählen', 'Wählen Sie Bilder aus dem Dateisystem aus.'];
 $GLOBALS['TL_LANG']['tl_rsz_steckbrief']['aktiv'] = ['Profil im Frontend veröffentlichen?', 'Soll das Profil im Frontend angezeigt werden?'];
 $GLOBALS['TL_LANG']['tl_rsz_steckbrief']['my_pics'] = ['Bilder auswählen', 'Lade in der Dateiverwaltung Bilder in dein Benutzerverzeichnis. Wähle anschliessend die Bilder aus, die im Frontend von dir angezeigt werden sollen. Es werden max. 8 Bilder angezeigt.'];
 $GLOBALS['TL_LANG']['tl_rsz_steckbrief']['image_description'] = ['Bildbeschreibung(en)', 'Trenne die Beschreibung f&uuml;r jedes Bild durch drei aufeinander folgende Sternchen -> ***'];
