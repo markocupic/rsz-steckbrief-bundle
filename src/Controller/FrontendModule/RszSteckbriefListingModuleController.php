@@ -104,7 +104,7 @@ class RszSteckbriefListingModuleController extends AbstractFrontendModuleControl
         $portraits = [];
 
         $objSteckbrief = $databaseAdapter->getInstance()
-            ->prepare("SELECT * FROM tl_steckbriefe WHERE multiSRC != ''")
+            ->prepare("SELECT * FROM tl_rsz_steckbrief WHERE multiSRC != ''")
             ->execute();
 
         while ($objSteckbrief->next())
