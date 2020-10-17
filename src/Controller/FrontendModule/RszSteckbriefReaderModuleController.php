@@ -1,15 +1,16 @@
 <?php
 
-/**
- * @copyright  Marko Cupic 2020 <m.cupic@gmx.ch>
- * @author     Marko Cupic
- * @package    RSZ Mein Steckbrief
- * @license    MIT
- * @see        https://github.com/markocupic/rsz-steckbrief-bundle
- *
- */
-
 declare(strict_types=1);
+
+/*
+ * This file is part of Employee Bundle.
+ *
+ * (c) Marko Cupic 2020 <m.cupic@gmx.ch>
+ * @license MIT
+ * For the full copyright and license information,
+ * please view the LICENSE file that was distributed with this source code.
+ * @link https://github.com/markocupic/rsz-steckbrief-bundle
+ */
 
 namespace Markocupic\RszSteckbriefBundle\Controller\FrontendModule;
 
@@ -33,32 +34,37 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * Class RszSteckbriefReaderModuleController
- * @package Markocupic\RszSteckbriefBundle\Controller\FrontendModule
+ * Class RszSteckbriefReaderModuleController.
  */
 class RszSteckbriefReaderModuleController extends AbstractFrontendModuleController
 {
-    /** @var string */
+    /**
+     * @var string
+     */
     private $projectDir;
 
-    /** @var string */
+    /**
+     * @var string
+     */
     private $strRszSteckbriefAvatarSrc;
 
-    /** @var RequestStack */
+    /**
+     * @var RequestStack
+     */
     private $requestStack;
 
-    /** @var ScopeMatcher */
+    /**
+     * @var ScopeMatcher
+     */
     private $scopeMatcher;
 
-    /** @var RszSteckbriefModel */
+    /**
+     * @var RszSteckbriefModel
+     */
     private $objRszSteckbrief;
 
     /**
      * RszSteckbriefReaderModuleController constructor.
-     * @param string $projectDir
-     * @param string $strRszSteckbriefAvatarSrc
-     * @param RequestStack $requestStack
-     * @param ScopeMatcher $scopeMatcher
      */
     public function __construct(string $projectDir, string $strRszSteckbriefAvatarSrc, RequestStack $requestStack, ScopeMatcher $scopeMatcher)
     {
@@ -70,13 +76,7 @@ class RszSteckbriefReaderModuleController extends AbstractFrontendModuleControll
 
     /**
      * This method extends the parent __invoke method,
-     * its usage is usually not necessary
-     * @param Request $request
-     * @param ModuleModel $model
-     * @param string $section
-     * @param array|null $classes
-     * @param PageModel|null $page
-     * @return Response
+     * its usage is usually not necessary.
      */
     public function __invoke(Request $request, ModuleModel $model, string $section, array $classes = null, PageModel $page = null): Response
     {
@@ -95,31 +95,26 @@ class RszSteckbriefReaderModuleController extends AbstractFrontendModuleControll
         /** @var Environment $environmentAdapter */
         $environmentAdapter = $this->get('contao.framework')->getAdapter(Environment::class);
 
-        if ($this->scopeMatcher->isFrontendRequest($this->requestStack->getCurrentRequest()))
-        {
+        if ($this->scopeMatcher->isFrontendRequest($this->requestStack->getCurrentRequest())) {
             $blnShow = false;
 
             // Set the item from the auto_item parameter
-            if (!isset($_GET['person']) && $configAdapter->get('useAutoItem') && isset($_GET['auto_item']))
-            {
+            if (!isset($_GET['person']) && $configAdapter->get('useAutoItem') && isset($_GET['auto_item'])) {
                 $inputAdapter->setGet('person', $inputAdapter->get('auto_item'));
             }
 
-            if ($inputAdapter->get('person') != '')
-            {
+            if ('' !== $inputAdapter->get('person')) {
                 $objUser = $userModelAdapter->findByUsername($inputAdapter->get('person'));
-                if ($objUser !== null)
-                {
-                    if (($this->objRszSteckbrief = $rszSteckbriefModelAdapter->findByPid($objUser->id)) !== null)
-                    {
+
+                if (null !== $objUser) {
+                    if (null !== ($this->objRszSteckbrief = $rszSteckbriefModelAdapter->findByPid($objUser->id))) {
                         $blnShow = true;
                     }
                 }
             }
 
-            if (!$blnShow)
-            {
-                throw new PageNotFoundException('Page not found: ' . $environmentAdapter->get('uri'));
+            if (!$blnShow) {
+                throw new PageNotFoundException('Page not found: '.$environmentAdapter->get('uri'));
             }
         }
 
@@ -127,21 +122,17 @@ class RszSteckbriefReaderModuleController extends AbstractFrontendModuleControll
     }
 
     /**
-     * Lazyload some services
-     * @return array
+     * Lazyload some services.
      */
     public static function getSubscribedServices(): array
     {
         $services = parent::getSubscribedServices();
         $services['contao.framework'] = ContaoFramework::class;
+
         return $services;
     }
 
     /**
-     * @param Template $template
-     * @param ModuleModel $model
-     * @param Request $request
-     * @return null|Response
      * @throws \Exception
      */
     protected function getResponse(Template $template, ModuleModel $model, Request $request): ?Response
@@ -167,14 +158,13 @@ class RszSteckbriefReaderModuleController extends AbstractFrontendModuleControll
         $arrSteckbrief = $this->objRszSteckbrief->row();
         $arrSteckbrief['city'] = $objUser->city;
 
-        foreach ($arrSteckbrief as $key => $content)
-        {
-            $template->{$key} = stripslashes($content);
+        foreach ($arrSteckbrief as $key => $content) {
+            $template->{$key} = stripslashes((string)$content);
         }
 
         $template->arrVideos = [];
-        if ($arrSteckbrief['video_integration'] != '')
-        {
+
+        if ('' !== $arrSteckbrief['video_integration']) {
             $template->arrVideos = array_values(explode(',', $arrSteckbrief['video_integration']));
         }
 
@@ -183,17 +173,15 @@ class RszSteckbriefReaderModuleController extends AbstractFrontendModuleControll
         $images = [];
 
         // Return if there are no files
-        if (!empty($multiSRC) && is_array($multiSRC))
-        {
+        if (!empty($multiSRC) && \is_array($multiSRC)) {
             // Get the file entries from the database
             $filesModel = $filesModelAdapter->findMultipleByUuids($multiSRC);
-            if ($filesModel !== null)
-            {
-                while ($filesModel->next())
-                {
+
+            if (null !== $filesModel) {
+                while ($filesModel->next()) {
                     $arrImage = [];
-                    if (!file_exists($this->projectDir . '/' . $filesModel->path))
-                    {
+
+                    if (!file_exists($this->projectDir.'/'.$filesModel->path)) {
                         $filesModel->path = $this->strRszSteckbriefAvatarSrc;
                     }
                     $arrImage['uuid'] = $filesModel->uuid;
@@ -204,29 +192,27 @@ class RszSteckbriefReaderModuleController extends AbstractFrontendModuleControll
         }
 
         // Custom sorting in the backend
-        if (!empty($orderSRC) && is_array($orderSRC))
-        {
+        if (!empty($orderSRC) && \is_array($orderSRC)) {
             $tmp = $orderSRC;
 
-            if (!empty($tmp) && is_array($tmp))
-            {
+            if (!empty($tmp) && \is_array($tmp)) {
                 // Remove all values
-                $arrOrder = array_map(function () {
-                }, array_flip($tmp));
+                $arrOrder = array_map(
+                    static function (): void {
+                    },
+                    array_flip($tmp)
+                );
 
                 // Move the matching elements to their position in $arrOrder
-                foreach ($images as $k => $v)
-                {
-                    if (array_key_exists($v['uuid'], $arrOrder))
-                    {
+                foreach ($images as $k => $v) {
+                    if (\array_key_exists($v['uuid'], $arrOrder)) {
                         $arrOrder[$v['uuid']] = $v;
                         unset($images[$k]);
                     }
                 }
 
                 // Append the left-over images at the end
-                if (!empty($images))
-                {
+                if (!empty($images)) {
                     $arrOrder = array_merge($arrOrder, array_values($images));
                 }
 
@@ -238,9 +224,9 @@ class RszSteckbriefReaderModuleController extends AbstractFrontendModuleControll
 
         // Finally store the image captions in an array
         $imageCaption = explode('***', $this->objRszSteckbrief->image_description);
-        foreach ($images as $k => $v)
-        {
-            $images[$k]['caption'] = $imageCaption[$k] ? htmlspecialchars(str_replace(chr(10), '', $imageCaption[$k])) : '';
+
+        foreach (array_keys($images) as $k) {
+            $images[$k]['caption'] = $imageCaption[$k] ? htmlspecialchars(str_replace(\chr(10), '', $imageCaption[$k])) : '';
         }
 
         $template->arrImages = $images;
@@ -248,4 +234,3 @@ class RszSteckbriefReaderModuleController extends AbstractFrontendModuleControll
         return $template->getResponse();
     }
 }
-
