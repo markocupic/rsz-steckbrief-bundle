@@ -3,8 +3,8 @@
 declare(strict_types=1);
 
 /*
- * This file is part of Employee Bundle.
- *
+ * This file is part of RSZ Steckbrief Bundle.
+*
  * (c) Marko Cupic 2020 <m.cupic@gmx.ch>
  * @license MIT
  * For the full copyright and license information,
@@ -159,7 +159,7 @@ class RszSteckbriefReaderModuleController extends AbstractFrontendModuleControll
         $arrSteckbrief['city'] = $objUser->city;
 
         foreach ($arrSteckbrief as $key => $content) {
-            $template->{$key} = stripslashes((string)$content);
+            $template->{$key} = stripslashes((string) $content);
         }
 
         $template->arrVideos = [];

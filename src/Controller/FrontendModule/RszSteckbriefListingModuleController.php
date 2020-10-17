@@ -1,15 +1,16 @@
 <?php
 
-/**
- * @copyright  Marko Cupic 2020 <m.cupic@gmx.ch>
- * @author     Marko Cupic
- * @package    RSZ Mein Steckbrief
- * @license    MIT
- * @see        https://github.com/markocupic/rsz-steckbrief-bundle
- *
- */
-
 declare(strict_types=1);
+
+/*
+ * This file is part of RSZ Steckbrief Bundle.
+*
+ * (c) Marko Cupic 2020 <m.cupic@gmx.ch>
+ * @license MIT
+ * For the full copyright and license information,
+ * please view the LICENSE file that was distributed with this source code.
+ * @link https://github.com/markocupic/rsz-steckbrief-bundle
+ */
 
 namespace Markocupic\RszSteckbriefBundle\Controller\FrontendModule;
 
@@ -28,18 +29,22 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * Class RszSteckbriefListingModuleController
- * @package Markocupic\RszSteckbriefBundle\Controller\FrontendModule
+ * Class RszSteckbriefListingModuleController.
  */
 class RszSteckbriefListingModuleController extends AbstractFrontendModuleController
 {
+    /**
+     * @var string
+     */
+    protected $strAvatar = 'system/modules/steckbriefe/html/avatar.png';
 
-    /** @var string */
+    /**
+     * @var string
+     */
     private $projectDir;
 
     /**
      * RszSteckbriefListingModuleController constructor.
-     * @param string $projectDir
      */
     public function __construct(string $projectDir)
     {
@@ -48,13 +53,7 @@ class RszSteckbriefListingModuleController extends AbstractFrontendModuleControl
 
     /**
      * This method extends the parent __invoke method,
-     * its usage is usually not necessary
-     * @param Request $request
-     * @param ModuleModel $model
-     * @param string $section
-     * @param array|null $classes
-     * @param PageModel|null $page
-     * @return Response
+     * its usage is usually not necessary.
      */
     public function __invoke(Request $request, ModuleModel $model, string $section, array $classes = null, PageModel $page = null): Response
     {
@@ -62,26 +61,17 @@ class RszSteckbriefListingModuleController extends AbstractFrontendModuleControl
     }
 
     /**
-     * Lazyload some services
-     * @return array
+     * Lazyload some services.
      */
     public static function getSubscribedServices(): array
     {
         $services = parent::getSubscribedServices();
         $services['contao.framework'] = ContaoFramework::class;
+
         return $services;
     }
 
     /**
-     * @var string
-     */
-    protected $strAvatar = 'system/modules/steckbriefe/html/avatar.png';
-
-    /**
-     * @param Template $template
-     * @param ModuleModel $model
-     * @param Request $request
-     * @return null|Response
      * @throws \Exception
      */
     protected function getResponse(Template $template, ModuleModel $model, Request $request): ?Response
@@ -105,58 +95,52 @@ class RszSteckbriefListingModuleController extends AbstractFrontendModuleControl
 
         $objSteckbrief = $databaseAdapter->getInstance()
             ->prepare("SELECT * FROM tl_rsz_steckbrief WHERE multiSRC != ''")
-            ->execute();
+            ->execute()
+        ;
 
-        while ($objSteckbrief->next())
-        {
+        while ($objSteckbrief->next()) {
             /** @var UserModel $objUser */
-            if (($objUser = $rszSteckbriefModel->findByPk($objSteckbrief->id)->getRelated('pid')) === null)
-            {
+            if (null === ($objUser = $rszSteckbriefModel->findByPk($objSteckbrief->id)->getRelated('pid'))) {
                 continue;
             }
 
-            if (!$this->isAthlete($objUser) || !$objUser->isRSZ)
-            {
+            if (!$this->isAthlete($objUser) || !$objUser->isRSZ) {
                 continue;
             }
 
             $objSteckbrief->multiSRC = unserialize($objSteckbrief->multiSRC);
-            if (!empty($objSteckbrief->multiSRC) && is_array($objSteckbrief->multiSRC))
-            {
-                if (($objFiles = $filesModelAdapter->findMultipleByUuids($objSteckbrief->multiSRC)) !== null)
-                {
+
+            if (!empty($objSteckbrief->multiSRC) && \is_array($objSteckbrief->multiSRC)) {
+                if (null !== ($objFiles = $filesModelAdapter->findMultipleByUuids($objSteckbrief->multiSRC))) {
                     $images = [];
 
-                    while ($objFiles->next())
-                    {
-                        if ($validatorAdapter->isUuid($objFiles->uuid) && is_file($this->projectDir . '/' . $objFiles->path))
-                        {
+                    while ($objFiles->next()) {
+                        if ($validatorAdapter->isUuid($objFiles->uuid) && is_file($this->projectDir.'/'.$objFiles->path)) {
                             $images[] = ['uuid' => $objFiles->uuid];
                         }
                     }
 
                     // Custom order
-                    if (!empty($objSteckbrief->orderSRC) && is_array(unserialize($objSteckbrief->orderSRC)))
-                    {
+                    if (!empty($objSteckbrief->orderSRC) && \is_array(unserialize($objSteckbrief->orderSRC))) {
                         $tmp = unserialize($objSteckbrief->orderSRC);
 
                         // Remove all values
-                        $arrOrder = array_map(function () {
-                        }, array_flip($tmp));
+                        $arrOrder = array_map(
+                            static function (): void {
+                            },
+                            array_flip($tmp)
+                        );
 
                         // Move the matching elements to their position in $arrOrder
-                        foreach ($images as $k => $v)
-                        {
-                            if (array_key_exists($v['uuid'], $arrOrder))
-                            {
+                        foreach ($images as $k => $v) {
+                            if (\array_key_exists($v['uuid'], $arrOrder)) {
                                 $arrOrder[$v['uuid']] = $v;
                                 unset($images[$k]);
                             }
                         }
 
                         // Append the left-over images at the end
-                        if (!empty($images))
-                        {
+                        if (!empty($images)) {
                             $arrOrder = array_merge($arrOrder, array_values($images));
                         }
 
@@ -169,11 +153,11 @@ class RszSteckbriefListingModuleController extends AbstractFrontendModuleControl
                     $image = $images[0];
 
                     $portraits[] = [
-                        'id'        => $objSteckbrief->id,
-                        'pid'       => $objSteckbrief->pid,
-                        'src'       => FilesModel::findByUuid($image['uuid'])->path,
+                        'id' => $objSteckbrief->id,
+                        'pid' => $objSteckbrief->pid,
+                        'src' => FilesModel::findByUuid($image['uuid'])->path,
                         'userModel' => $objUser,
-                        'href'      => $objJumpTo ? $objJumpTo->getFrontendUrl('/' . $objUser->username) : null,
+                        'href' => $objJumpTo ? $objJumpTo->getFrontendUrl('/'.$objUser->username) : null,
                     ];
                 }
             }
@@ -187,19 +171,14 @@ class RszSteckbriefListingModuleController extends AbstractFrontendModuleControl
         return $template->getResponse();
     }
 
-    /**
-     * @param UserModel $objUser
-     * @return bool
-     */
     protected function isAthlete(UserModel $objUser): bool
     {
         $arrFunktionen = StringUtil::deserialize($objUser->funktion, true);
-        if (in_array('Athlet', $arrFunktionen))
-        {
+
+        if (\in_array('Athlet', $arrFunktionen, true)) {
             return true;
         }
 
         return false;
     }
 }
-

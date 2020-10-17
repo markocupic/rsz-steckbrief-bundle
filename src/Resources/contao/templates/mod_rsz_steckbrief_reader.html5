@@ -1,6 +1,6 @@
 <?php
-$felder = array("city", "hobbies", "klettert_seit", "best_competition_results", "schwerste_rotpunktroute_indoor", "schwerste_boulderroute_indoor");
-$felder2 = array("lieblingsklettergebiet", "sponsoren", "ziele", "leitsatz");
+$felder = ['city', 'hobbies', 'klettert_seit', 'best_competition_results', 'schwerste_rotpunktroute_indoor', 'schwerste_boulderroute_indoor'];
+$felder2 = ['lieblingsklettergebiet', 'sponsoren', 'ziele', 'leitsatz'];
 $GLOBALS['TL_LANG']['tl_rsz_steckbrief']['city'] = ['Wohnort', 'Geben Sie bitte Ihren Wohnort an.'];
 ?>
 
@@ -11,13 +11,13 @@ $GLOBALS['TL_LANG']['tl_rsz_steckbrief']['city'] = ['Wohnort', 'Geben Sie bitte 
 <div class="text-right mb-4">{{link::back}}</div>
 
 <h1><?= $this->userModel->name ?></h1>
-<?php if(!empty($this->arrImages)): ?>
+<?php if (!empty($this->arrImages)): ?>
 <ul class="row">
     <?php foreach ($this->arrImages as $image): ?>
     <li class="col-12 col-sm-6 col-md-4 col-lg-3 mb-4">
         <figure class="image_container">
-            <a href="<?= urlencode($image["imageSrc"]) ?>" data-lightbox="member-profile" title="<?= $image["caption"] ?>">
-            {{image::<?= $image["imageSrc"] ?>?mode=crop&width=700&height=700&rel=data-lightbox }}
+            <a href="<?= urlencode($image['imageSrc']) ?>" data-lightbox="member-profile" title="<?= $image['caption'] ?>">
+            {{image::<?= $image['imageSrc'] ?>?mode=crop&width=700&height=700&rel=data-lightbox }}
             </a>
         </figure>
     </li>
@@ -29,32 +29,32 @@ $GLOBALS['TL_LANG']['tl_rsz_steckbrief']['city'] = ['Wohnort', 'Geben Sie bitte 
 <table class="table">
 
     <?php foreach ($felder as $key): ?>
-        <?php if ($this->{$key} != ""): ?>
+        <?php if ('' != $this->{$key}): ?>
         <tr>
-            <td class="description"><strong><?= $this->trans('tl_rsz_steckbrief.' . $key . '.0') ?>:</strong></td>
+            <td class="description"><strong><?= $this->trans('tl_rsz_steckbrief.'.$key.'.0') ?>:</strong></td>
             <td><?= nl2br($this->{$key}) ?></td>
         </tr>
         <?php endif; ?>
     <?php endforeach; ?>
 
-    <?php if ($this->schwerste_route_gebiet != ""): ?>
+    <?php if ('' != $this->schwerste_route_gebiet): ?>
     <tr>
         <td class="description"><strong>Schwerste Route outdoor (rotpunkt): </strong></td>
-        <td><?= $this->schwerste_route_gebiet . ", " . $this->schwerste_route_routenname . ", " . $this->schwerste_route_difficulty ?></td>
+        <td><?= $this->schwerste_route_gebiet.', '.$this->schwerste_route_routenname.', '.$this->schwerste_route_difficulty ?></td>
     </tr>
     <?php endif;
 
-    if ($this->schwerster_boulder_gebiet != ""): ?>
+    if ('' != $this->schwerster_boulder_gebiet): ?>
     <tr>
         <td class="description"><strong>Schwerster Boulder outdoor: </strong></td>
-        <td><?= $this->schwerster_boulder_gebiet . ", ". $this->schwerster_boulder_routenname . ", " . $this->schwerster_boulder_difficulty ?></td>
+        <td><?= $this->schwerster_boulder_gebiet.', '.$this->schwerster_boulder_routenname.', '.$this->schwerster_boulder_difficulty ?></td>
     </tr>
     <?php endif; ?>
 
     <?php foreach ($felder2 as $key): ?>
-    <?php if ($this->{$key} != ""): ?>
+    <?php if ('' != $this->{$key}): ?>
     <tr>
-        <td class="description"><strong><?= $this->trans('tl_rsz_steckbrief.' . $key . '.0') ?>:</strong></td>
+        <td class="description"><strong><?= $this->trans('tl_rsz_steckbrief.'.$key.'.0') ?>:</strong></td>
         <td><?= nl2br($this->{$key}) ?></td>
     </tr>
     <?php endif; ?>
@@ -63,7 +63,7 @@ $GLOBALS['TL_LANG']['tl_rsz_steckbrief']['city'] = ['Wohnort', 'Geben Sie bitte 
 </table>
 
 <div class="row">
-    <?php foreach($this->arrVideos as $video): ?>
+    <?php foreach ($this->arrVideos as $video): ?>
     <div class="col-12 col-md-6 mb-3">
         {{bootstrapResponsiveYoutubeEmbed::<?= $video ?>}}
     </div>

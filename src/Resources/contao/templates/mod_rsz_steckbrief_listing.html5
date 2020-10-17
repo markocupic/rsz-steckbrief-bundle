@@ -3,16 +3,16 @@
 <?php $this->block('content'); ?>
 
 <div class="row">
-    <?php foreach($this->portraits as $portrait): ?>
+    <?php foreach ($this->portraits as $portrait): ?>
     <div class="col-6 col-lg-4">
-        <?php if($portrait['href']): ?>
+        <?php if ($portrait['href']): ?>
         <a href="<?= $portrait['href'] ?>" title="Portrait von <?= $portrait['userModel']->name ?>">
         <?php endif; ?>
             <figure class="figure image_container w-100">
                 {{image::<?= $portrait['src'] ?>?width=500&height=500&mode=center_center&class=img-fluid w-100}}
                 <figcaption class="figure-caption"><?= $portrait['userModel']->name ?></figcaption>
             </figure>
-        <?php if($portrait['href']): ?>
+        <?php if ($portrait['href']): ?>
         </a>
         <?php endif; ?>
     </div>

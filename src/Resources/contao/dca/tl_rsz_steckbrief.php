@@ -1,8 +1,8 @@
 <?php
 
 /*
- * This file is part of Employee Bundle.
- *
+ * This file is part of RSZ Steckbrief Bundle.
+*
  * (c) Marko Cupic 2020 <m.cupic@gmx.ch>
  * @license MIT
  * For the full copyright and license information,
@@ -272,10 +272,10 @@ class tl_rsz_steckbrief extends Backend
 	/**
 	 * Replace pid with tl_user.name
 	 *
-	 * @param array                $row
-	 * @param string               $label
+	 * @param array         $row
+	 * @param string        $label
 	 * @param DataContainer $dc
-	 * @param array                $args
+	 * @param array         $args
 	 *
 	 * @return array
 	 */

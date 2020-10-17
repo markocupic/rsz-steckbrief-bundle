@@ -1,12 +1,13 @@
 <?php
 
-/**
- * @copyright  Marko Cupic 2020 <m.cupic@gmx.ch>
- * @author     Marko Cupic
- * @package    RSZ Mein Steckbrief
- * @license    MIT
- * @see        https://github.com/markocupic/rsz-steckbrief-bundle
- *
+/*
+ * This file is part of RSZ Steckbrief Bundle.
+*
+ * (c) Marko Cupic 2020 <m.cupic@gmx.ch>
+ * @license MIT
+ * For the full copyright and license information,
+ * please view the LICENSE file that was distributed with this source code.
+ * @link https://github.com/markocupic/rsz-steckbrief-bundle
  */
 
 /**
@@ -20,10 +21,10 @@ $GLOBALS['TL_DCA']['tl_module']['palettes']['rsz_steckbrief_reader_module'] = '{
  */
 $GLOBALS['TL_DCA']['tl_module']['fields']['rszSteckbriefReaderPage'] = array
 (
-    'exclude'                 => true,
-    'inputType'               => 'pageTree',
-    'foreignKey'              => 'tl_page.title',
-    'eval'                    => array('fieldType'=>'radio','tl_class' => 'clr'), // do not set mandatory (see #5453)
-    'sql'                     => "int(10) unsigned NOT NULL default 0",
-    'relation'                => array('type'=>'hasOne', 'load'=>'lazy')
+	'exclude'                 => true,
+	'inputType'               => 'pageTree',
+	'foreignKey'              => 'tl_page.title',
+	'eval'                    => array('fieldType'=>'radio', 'tl_class' => 'clr'), // do not set mandatory (see #5453)
+	'sql'                     => "int(10) unsigned NOT NULL default 0",
+	'relation'                => array('type'=>'hasOne', 'load'=>'lazy')
 );
