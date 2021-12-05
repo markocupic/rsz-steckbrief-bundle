@@ -2,8 +2,8 @@
 
 /*
  * This file is part of RSZ Steckbrief Bundle.
-*
- * (c) Marko Cupic 2020 <m.cupic@gmx.ch>
+ *
+ * (c) Marko Cupic 2021 <m.cupic@gmx.ch>
  * @license MIT
  * For the full copyright and license information,
  * please view the LICENSE file that was distributed with this source code.
@@ -113,103 +113,103 @@ $GLOBALS['TL_DCA']['tl_rsz_steckbrief'] = array(
 			'inputType'   => 'textarea',
 			'explanation' => &$GLOBALS['TL_LANG']['tl_rsz_steckbrief']['image_description_explanation'],
 			'eval'        => array('allowHtml' => false),
-			'sql'         => "text NOT NULL default ''",
+			'sql'         => "mediumtext NULL",
 		),
 		'klettert_seit'                  => array(
 			'exclude'   => true,
 			'inputType' => 'text',
 			'eval'      => array('allowHtml' => false),
-			'sql'       => "text NOT NULL default ''",
+			'sql'       => "mediumtext NULL",
 		),
 		'best_competition_results'       => array(
 			'exclude'   => true,
 			'inputType' => 'textarea',
 			'eval'      => array('allowHtml' => false, 'tl_class' => 'clr'),
-			'sql'       => "text NOT NULL default ''",
+			'sql'       => "mediumtext NULL",
 		),
 		'schwerste_rotpunktroute_indoor' => array(
 			'exclude'   => true,
 			'inputType' => 'text',
 			'eval'      => array('allowHtml' => false),
-			'sql'       => "text NOT NULL default ''",
+			'sql'       => "mediumtext NULL",
 		),
 		'schwerste_boulderroute_indoor'  => array(
 			'exclude'   => true,
 			'inputType' => 'text',
 			'eval'      => array('allowHtml' => false),
-			'sql'       => "text NOT NULL default ''",
+			'sql'       => "mediumtext NULL",
 		),
 		'schwerste_route_gebiet'         => array(
 			'exclude'   => true,
 			'inputType' => 'text',
 			'eval'      => array('allowHtml' => false),
-			'sql'       => "text NOT NULL default ''",
+			'sql'       => "mediumtext NULL",
 		),
 		'schwerste_route_routenname'     => array(
 			'exclude'   => true,
 			'inputType' => 'text',
 			'eval'      => array('allowHtml' => false),
-			'sql'       => "text NOT NULL default ''",
+			'sql'       => "mediumtext NULL",
 		),
 		'schwerste_route_difficulty'     => array(
 			'exclude'   => true,
 			'inputType' => 'text',
 			'eval'      => array('allowHtml' => false),
-			'sql'       => "text NOT NULL default ''",
+			'sql'       => "mediumtext NULL",
 		),
 		'schwerster_boulder_gebiet'      => array(
 			'exclude'   => true,
 			'inputType' => 'text',
 			'eval'      => array('allowHtml' => false),
-			'sql'       => "text NOT NULL default ''",
+			'sql'       => "mediumtext NULL",
 		),
 		'schwerster_boulder_routenname'  => array(
 			'exclude'   => true,
 			'inputType' => 'text',
 			'eval'      => array('allowHtml' => false),
-			'sql'       => "text NOT NULL default ''",
+			'sql'       => "mediumtext NULL",
 		),
 		'schwerster_boulder_difficulty'  => array(
 			'exclude'   => true,
 			'inputType' => 'text',
 			'eval'      => array('allowHtml' => false),
-			'sql'       => "text NOT NULL default ''",
+			'sql'       => "mediumtext NULL",
 		),
 		'lieblingsklettergebiet'         => array(
 			'exclude'   => true,
 			'inputType' => 'textarea',
 			'eval'      => array('allowHtml' => false, 'tl_class' => 'clr'),
-			'sql'       => "text NOT NULL default ''",
+			'sql'       => "mediumtext NULL",
 		),
 		'sponsoren'                      => array(
 			'exclude'   => true,
 			'inputType' => 'textarea',
 			'eval'      => array('allowHtml' => false, 'tl_class' => 'clr'),
-			'sql'       => "text NOT NULL default ''",
+			'sql'       => "mediumtext NULL",
 		),
 		'ziele'                          => array(
 			'exclude'   => true,
 			'inputType' => 'textarea',
 			'eval'      => array('allowHtml' => false, 'tl_class' => 'clr'),
-			'sql'       => "text NOT NULL default ''",
+			'sql'       => "mediumtext NULL",
 		),
 		'leitsatz'                       => array(
 			'exclude'   => true,
 			'inputType' => 'textarea',
 			'eval'      => array('allowHtml' => false, 'tl_class' => 'clr'),
-			'sql'       => "text NOT NULL default ''",
+			'sql'       => "mediumtext NULL",
 		),
 		'hobbies'                        => array(
 			'exclude'   => true,
 			'inputType' => 'textarea',
 			'eval'      => array('allowHtml' => false, 'tl_class' => 'clr'),
-			'sql'       => "text NOT NULL default ''",
+			'sql'       => "mediumtext NULL",
 		),
 		'video_integration'              => array(
 			'exclude'   => true,
 			'inputType' => 'text',
 			'eval'      => array('allowHtml' => false),
-			'sql'       => "text NOT NULL default ''",
+			'sql'       => "mediumtext NULL",
 		)
 	)
 );
@@ -248,17 +248,28 @@ class tl_rsz_steckbrief extends Backend
 	public function createProfiles()
 	{
 		// erstellt von allen Benutzern ein Blanko-Profil, wenn noch keines vorhanden ist.
-		$objUser = $this->Database->execute("SELECT id, username FROM tl_user");
+		$objUser = $this->Database
+            ->execute("SELECT id, username FROM tl_user")
+        ;
 
 		while ($objUser->next())
 		{
-			$objSteckbriefe = $this->Database->prepare("SELECT * FROM tl_rsz_steckbrief WHERE pid=?")
-				->execute($objUser->id);
+			$objSteckbriefe = $this->Database
+                ->prepare("SELECT * FROM tl_rsz_steckbrief WHERE pid=?")
+				->execute($objUser->id)
+            ;
 
 			if (!$objSteckbriefe->numRows)
 			{
-				$objSteckbriefe = $this->Database->prepare("INSERT INTO  tl_rsz_steckbrief (pid) VALUES (?)")
-					->execute($objUser->id);
+				$set = array(
+					'pid' => $objUser->id,
+				);
+
+				$objSteckbriefe = $this->Database
+					->prepare("INSERT INTO  tl_rsz_steckbrief %s")
+					->set($set)
+					->execute($objUser->id)
+				;
 
 				if ($objSteckbriefe->affectedRows)
 				{
