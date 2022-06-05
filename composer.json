@@ -23,8 +23,12 @@
     "source": "https://github.com/markocupic/rsz-steckbrief-bundle"
   },
   "require": {
-    "contao/core-bundle": "^4.9",
+    "php": "^8.0",
+    "contao/core-bundle": "^4.13",
     "markocupic/rsz-benutzerverwaltung-bundle": "dev-master"
+  },
+  "require-dev": {
+    "contao/easy-coding-standard": "^5.0",
   },
   "autoload": {
     "psr-4": {

@@ -135,7 +135,7 @@ class RszSteckbriefReaderModuleController extends AbstractFrontendModuleControll
     /**
      * @throws \Exception
      */
-    protected function getResponse(Template $template, ModuleModel $model, Request $request): ?Response
+    protected function getResponse(Template $template, ModuleModel $model, Request $request): Response|null
     {
         /** @var System $systemAdapter */
         $systemAdapter = $this->get('contao.framework')->getAdapter(System::class);
@@ -164,7 +164,7 @@ class RszSteckbriefReaderModuleController extends AbstractFrontendModuleControll
 
         $template->arrVideos = [];
 
-        if ('' !== $arrSteckbrief['video_integration']) {
+        if (!empty($arrSteckbrief['video_integration'])) {
             $template->arrVideos = array_values(explode(',', $arrSteckbrief['video_integration']));
         }
 
@@ -195,38 +195,38 @@ class RszSteckbriefReaderModuleController extends AbstractFrontendModuleControll
         if (!empty($orderSRC) && \is_array($orderSRC)) {
             $tmp = $orderSRC;
 
-            if (!empty($tmp) && \is_array($tmp)) {
-                // Remove all values
-                $arrOrder = array_map(
-                    static function (): void {
-                    },
-                    array_flip($tmp)
-                );
+            // Remove all values
+            $arrOrder = array_map(
+                static function (): void {
+                },
+                array_flip($tmp)
+            );
 
-                // Move the matching elements to their position in $arrOrder
-                foreach ($images as $k => $v) {
-                    if (\array_key_exists($v['uuid'], $arrOrder)) {
-                        $arrOrder[$v['uuid']] = $v;
-                        unset($images[$k]);
-                    }
+            // Move the matching elements to their position in $arrOrder
+            foreach ($images as $k => $v) {
+                if (\array_key_exists($v['uuid'], $arrOrder)) {
+                    $arrOrder[$v['uuid']] = $v;
+                    unset($images[$k]);
                 }
-
-                // Append the left-over images at the end
-                if (!empty($images)) {
-                    $arrOrder = array_merge($arrOrder, array_values($images));
-                }
-
-                // Remove empty (unreplaced) entries
-                $images = array_values(array_filter($arrOrder));
-                unset($arrOrder);
             }
+
+            // Append the left-over images at the end
+            if (!empty($images)) {
+                $arrOrder = array_merge($arrOrder, array_values($images));
+            }
+
+            // Remove empty (not replaced) entries
+            $images = array_values(array_filter($arrOrder));
+            unset($arrOrder);
         }
 
-        // Finally store the image captions in an array
-        $imageCaption = explode('***', $this->objRszSteckbrief->image_description);
+        // finally store the image captions in an array
+        if (!empty($this->objRszSteckbrief->image_description)) {
+            $imageCaption = explode('***', $this->objRszSteckbrief->image_description);
 
-        foreach (array_keys($images) as $k) {
-            $images[$k]['caption'] = $imageCaption[$k] ? htmlspecialchars(str_replace(\chr(10), '', $imageCaption[$k])) : '';
+            foreach (array_keys($images) as $k) {
+                $images[$k]['caption'] = $imageCaption[$k] ? htmlspecialchars(str_replace(\chr(10), '', $imageCaption[$k])) : '';
+            }
         }
 
         $template->arrImages = $images;

@@ -8,7 +8,4 @@ cd..
 cd..
 :: src
 vendor\bin\ecs check vendor/markocupic/rsz-steckbrief-bundle/src --config vendor/markocupic/rsz-steckbrief-bundle/.ecs/config/default.php
-:: tests
-vendor\bin\ecs check vendor/markocupic/rsz-steckbrief-bundle/tests --config vendor/markocupic/rsz-steckbrief-bundle/.ecs/config/default.php
-::
-cd vendor/markocupic/rsz-steckbrief-bundle/.ecs./batch/check
+

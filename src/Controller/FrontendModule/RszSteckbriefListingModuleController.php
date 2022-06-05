@@ -74,7 +74,7 @@ class RszSteckbriefListingModuleController extends AbstractFrontendModuleControl
     /**
      * @throws \Exception
      */
-    protected function getResponse(Template $template, ModuleModel $model, Request $request): ?Response
+    protected function getResponse(Template $template, ModuleModel $model, Request $request): Response|null
     {
         /** @var Database $databaseAdapter */
         $databaseAdapter = $this->get('contao.framework')->getAdapter(Database::class);
@@ -144,7 +144,7 @@ class RszSteckbriefListingModuleController extends AbstractFrontendModuleControl
                             $arrOrder = array_merge($arrOrder, array_values($images));
                         }
 
-                        // Remove empty (unreplaced) entries
+                        // Remove empty (not replaced) entries
                         $images = array_values(array_filter($arrOrder));
                         unset($arrOrder);
                     }

@@ -1,22 +1,25 @@
 <?php
 
-/**
- * @copyright  Marko Cupic 2020 <m.cupic@gmx.ch>
- * @author     Marko Cupic
- * @package    RSZ Mein Steckbrief
- * @license    MIT
- * @see        https://github.com/markocupic/rsz-steckbrief-bundle
+declare(strict_types=1);
+
+/*
+ * This file is part of RSZ Steckbrief Bundle.
  *
+ * (c) Marko Cupic 2022 <m.cupic@gmx.ch>
+ * @license MIT
+ * For the full copyright and license information,
+ * please view the LICENSE file that was distributed with this source code.
+ * @link https://github.com/markocupic/rsz-steckbrief-bundle
  */
 
-/**
+/*
  * Operations
  */
-$GLOBALS['TL_LANG']['tl_rsz_steckbrief']['edit'] = ["Profil mit ID: %s bearbeiten", "Profil mit ID: %s bearbeiten"];
-$GLOBALS['TL_LANG']['tl_rsz_steckbrief']['delete'] = ["Profil mit ID: %s löschen", "Profil mit ID: %s löschen"];
-$GLOBALS['TL_LANG']['tl_rsz_steckbrief']['show'] = ["Profil mit ID: %s ansehen", "Profil mit ID: %s ansehen"];
+$GLOBALS['TL_LANG']['tl_rsz_steckbrief']['edit'] = ['Profil mit ID: %s bearbeiten', 'Profil mit ID: %s bearbeiten'];
+$GLOBALS['TL_LANG']['tl_rsz_steckbrief']['delete'] = ['Profil mit ID: %s löschen', 'Profil mit ID: %s löschen'];
+$GLOBALS['TL_LANG']['tl_rsz_steckbrief']['show'] = ['Profil mit ID: %s ansehen', 'Profil mit ID: %s ansehen'];
 
-/**
+/*
  * Legends
  */
 $GLOBALS['TL_LANG']['tl_rsz_steckbrief']['publish_legend'] = 'Veröffentlichungs-Einstellungen';
@@ -27,7 +30,7 @@ $GLOBALS['TL_LANG']['tl_rsz_steckbrief']['outdoorleistungen_routen'] = 'Meine bi
 $GLOBALS['TL_LANG']['tl_rsz_steckbrief']['outdoorleistungen_boulders'] = 'Mein bisher schwierigster Outdoorboulder';
 $GLOBALS['TL_LANG']['tl_rsz_steckbrief']['allgemeines'] = 'Allgemeines';
 
-/**
+/*
  * Fields
  */
 // Galerie
@@ -57,7 +60,7 @@ $GLOBALS['TL_LANG']['tl_rsz_steckbrief']['leitsatz'] = ['Mein Leitsatz', ''];
 $GLOBALS['TL_LANG']['tl_rsz_steckbrief']['hobbies'] = ['Meine Hobbies', ''];
 $GLOBALS['TL_LANG']['tl_rsz_steckbrief']['klettert_seit'] = ['Ich klettere seit', ''];
 
-/**
+/*
  * Explanation
  */
 $GLOBALS['TL_LANG']['tl_rsz_steckbrief']['image_description_explanation'] = 'Trenne die Beschreibung für jedes Bild durch drei aufeinander folgende Sternchen -> ***';

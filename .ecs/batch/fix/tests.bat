@@ -7,4 +7,3 @@ cd..
 cd..
 cd..
 vendor\bin\ecs check vendor/markocupic/rsz-steckbrief-bundle/tests --fix --config vendor/markocupic/rsz-steckbrief-bundle/.ecs/config/default.php
-cd vendor/markocupic/rsz-steckbrief-bundle/.ecs./batch/fix
