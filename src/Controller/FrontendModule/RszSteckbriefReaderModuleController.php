@@ -221,12 +221,14 @@ class RszSteckbriefReaderModuleController extends AbstractFrontendModuleControll
         }
 
         // finally store the image captions in an array
-        if (!empty($this->objRszSteckbrief->image_description)) {
+        if (is_array($images) && !empty($this->objRszSteckbrief->image_description)) {
             $imageCaption = explode('***', $this->objRszSteckbrief->image_description);
-
-            foreach (array_keys($images) as $k) {
-                $images[$k]['caption'] = $imageCaption[$k] ? htmlspecialchars(str_replace(\chr(10), '', $imageCaption[$k])) : '';
+            if(is_array($imageCaption) && !empty($imageCaption)){
+                foreach (array_keys($images) as $k) {
+                    $images[$k]['caption'] = isset($imageCaption[$k]) ? htmlspecialchars(str_replace(\chr(10), '', $imageCaption[$k])) : '';
+                }
             }
+
         }
 
         $template->arrImages = $images;
