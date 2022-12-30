@@ -10,7 +10,7 @@
         <?php endif; ?>
             <figure class="figure image_container w-100">
                 {{image::<?= $portrait['src'] ?>?width=500&height=500&mode=center_center&class=img-fluid w-100}}
-                <figcaption class="figure-caption"><?= $portrait['userModel']->name ?></figcaption>
+                <figcaption class="ms-1 mt-2 mb-3 figure-caption"><?= $portrait['userModel']->name ?></figcaption>
             </figure>
         <?php if ($portrait['href']): ?>
         </a>
