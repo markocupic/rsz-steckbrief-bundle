@@ -65,7 +65,7 @@ $GLOBALS['TL_LANG']['tl_rsz_steckbrief']['city'] = ['Wohnort', 'Geben Sie bitte 
 <div class="row">
     <?php foreach ($this->arrVideos as $video): ?>
     <div class="col-12 col-md-6 mb-3">
-        {{bootstrapResponsiveYoutubeEmbed::<?= $video ?>}}
+        {{bootstrapResponsiveYoutubeEmbed::<?= $video ?>?autoplay=1&playerAspectRatio=4x3}}
     </div>
     <?php endforeach; ?>
 </div>

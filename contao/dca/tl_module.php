@@ -5,7 +5,7 @@ declare(strict_types=1);
 /*
  * This file is part of RSZ Steckbrief Bundle.
  *
- * (c) Marko Cupic 2022 <m.cupic@gmx.ch>
+ * (c) Marko Cupic 2023 <m.cupic@gmx.ch>
  * @license MIT
  * For the full copyright and license information,
  * please view the LICENSE file that was distributed with this source code.
@@ -22,10 +22,10 @@ $GLOBALS['TL_DCA']['tl_module']['palettes']['rsz_steckbrief_reader_module'] = '{
  * Fields
  */
 $GLOBALS['TL_DCA']['tl_module']['fields']['rszSteckbriefReaderPage'] = [
-    'exclude'    => true,
-    'inputType'  => 'pageTree',
+    'exclude' => true,
+    'inputType' => 'pageTree',
     'foreignKey' => 'tl_page.title',
-    'eval'       => ['fieldType' => 'radio', 'tl_class' => 'clr'], // do not set mandatory (see #5453)
-    'sql'        => 'int(10) unsigned NOT NULL default 0',
-    'relation'   => ['type' => 'hasOne', 'load' => 'lazy'],
+    'eval' => ['fieldType' => 'radio', 'tl_class' => 'clr'], // do not set mandatory (see #5453)
+    'sql' => 'int(10) unsigned NOT NULL default 0',
+    'relation' => ['type' => 'hasOne', 'load' => 'lazy'],
 ];

@@ -5,7 +5,7 @@ declare(strict_types=1);
 /*
  * This file is part of RSZ Steckbrief Bundle.
  *
- * (c) Marko Cupic 2022 <m.cupic@gmx.ch>
+ * (c) Marko Cupic 2023 <m.cupic@gmx.ch>
  * @license MIT
  * For the full copyright and license information,
  * please view the LICENSE file that was distributed with this source code.
@@ -15,22 +15,19 @@ declare(strict_types=1);
 use Contao\BackendUser;
 use Contao\DataContainer;
 use Contao\UserModel;
+use Contao\DC_Table;
 
-/*
- * Table tl_rsz_steckbrief
- */
 $GLOBALS['TL_DCA']['tl_rsz_steckbrief'] = [
     // Config
     'config'   => [
         'ptable'           => 'tl_user',
-        'dataContainer'    => 'Table',
+        'dataContainer'    => DC_Table::class,
         'enableVersioning' => true,
         'onload_callback'  => [
             ['tl_rsz_steckbrief', 'createProfiles'],
             ['tl_rsz_steckbrief', 'filterList'],
         ],
         'notDeletable'     => true,
-        'notSortable'      => true,
         'notCopyable'      => true,
         'notSortable'      => true,
         'notCreatable'     => true,
@@ -44,11 +41,11 @@ $GLOBALS['TL_DCA']['tl_rsz_steckbrief'] = [
     // List
     'list'     => [
         'sorting'           => [
-            'mode'            => 1,
+            'mode'            => DataContainer::MODE_SORTED,
             // Do not permit access to foreign profiles (except admins)
             'filter'          => [['pid=?', BackendUser::getInstance()->id]],
             'fields'          => ['pid'],
-            'flag'            => 1,
+            'flag'            => DataContainer::SORT_INITIAL_LETTER_ASC,
             'disableGrouping' => true,
         ],
         'label'             => [
@@ -96,7 +93,7 @@ $GLOBALS['TL_DCA']['tl_rsz_steckbrief'] = [
         ],
         'aktiv'                          => [
             'exclude'   => true,
-            'flag'      => 1,
+            'flag'      => DataContainer::SORT_INITIAL_LETTER_ASC,
             'inputType' => 'checkbox',
             'sql'       => "int(1) unsigned NOT NULL default '0'",
         ],
@@ -111,7 +108,7 @@ $GLOBALS['TL_DCA']['tl_rsz_steckbrief'] = [
         ],
         'image_description'              => [
             'exclude'     => true,
-            'flag'        => 1,
+            'flag'        => DataContainer::SORT_INITIAL_LETTER_ASC,
             'inputType'   => 'textarea',
             'explanation' => &$GLOBALS['TL_LANG']['tl_rsz_steckbrief']['image_description_explanation'],
             'eval'        => ['allowHtml' => false],
@@ -216,19 +213,8 @@ $GLOBALS['TL_DCA']['tl_rsz_steckbrief'] = [
     ],
 ];
 
-/**
- * Class tl_rsz_steckbrief.
- */
 class tl_rsz_steckbrief extends Backend
 {
-    /**
-     * tl_rsz_steckbrief constructor.
-     */
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
     /**
      * Onload callback.
      */
@@ -248,7 +234,7 @@ class tl_rsz_steckbrief extends Backend
      */
     public function createProfiles(): void
     {
-        // erstellt von allen Benutzern ein Blanko-Profil, wenn noch keines vorhanden ist.
+        // Create a blanko profile if not exists.
         $objUser = $this->Database
             ->execute('SELECT id, username FROM tl_user');
 
@@ -276,15 +262,9 @@ class tl_rsz_steckbrief extends Backend
     }
 
     /**
-     * Replace pid with tl_user.name.
-     *
-     * @param array $row
-     * @param string $label
-     * @param array $args
-     *
-     * @return array
+     * Replace the pid with tl_user.name.
      */
-    public function labelCallback($row, $label, DataContainer $dc, $args)
+    public function labelCallback(array $row, string $label, DataContainer $dc, array $args): array
     {
         $args[0] = null !== UserModel::findByPk($args[0]) ? UserModel::findByPk($args[0])->name : 'Unbekannt';
 

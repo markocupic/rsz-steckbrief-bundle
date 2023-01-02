@@ -1,0 +1,12 @@
+services:
+  _defaults:
+    autowire: true
+    autoconfigure: true
+    public: true
+    bind:
+      $projectDir: '%kernel.project_dir%'
+      $strRszSteckbriefAvatarSrc: '%rsz-steckbrief-avatar-path%'
+
+  Markocupic\RszSteckbriefBundle\:
+    resource: ../src/
+    exclude: ../src/{DependencyInjection}

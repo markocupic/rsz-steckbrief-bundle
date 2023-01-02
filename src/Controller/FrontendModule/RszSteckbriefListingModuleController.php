@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 /*
  * This file is part of RSZ Steckbrief Bundle.
-*
- * (c) Marko Cupic 2020 <m.cupic@gmx.ch>
+ *
+ * (c) Marko Cupic 2023 <m.cupic@gmx.ch>
  * @license MIT
  * For the full copyright and license information,
  * please view the LICENSE file that was distributed with this source code.
@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Markocupic\RszSteckbriefBundle\Controller\FrontendModule;
 
 use Contao\CoreBundle\Controller\FrontendModule\AbstractFrontendModuleController;
+use Contao\CoreBundle\DependencyInjection\Attribute\AsFrontendModule;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\Database;
 use Contao\FilesModel;
@@ -28,67 +29,29 @@ use Markocupic\RszSteckbriefBundle\Model\RszSteckbriefModel;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-/**
- * Class RszSteckbriefListingModuleController.
- */
+#[AsFrontendModule(self::TYPE, category:'rsz_frontend_modules', template: 'mod_rsz_steckbrief_listing')]
 class RszSteckbriefListingModuleController extends AbstractFrontendModuleController
 {
-    /**
-     * @var string
-     */
-    protected $strAvatar = 'system/modules/steckbriefe/html/avatar.png';
+    public const TYPE = 'rsz_steckbrief_listing_module';
+    private ContaoFramework $framework;
+    private string $projectDir;
 
-    /**
-     * @var string
-     */
-    private $projectDir;
-
-    /**
-     * RszSteckbriefListingModuleController constructor.
-     */
-    public function __construct(string $projectDir)
+    public function __construct(ContaoFramework $framework, string $projectDir)
     {
+        $this->framework = $framework;
         $this->projectDir = $projectDir;
-    }
-
-    /**
-     * This method extends the parent __invoke method,
-     * its usage is usually not necessary.
-     */
-    public function __invoke(Request $request, ModuleModel $model, string $section, array $classes = null, PageModel $page = null): Response
-    {
-        return parent::__invoke($request, $model, $section, $classes);
-    }
-
-    /**
-     * Lazyload some services.
-     */
-    public static function getSubscribedServices(): array
-    {
-        $services = parent::getSubscribedServices();
-        $services['contao.framework'] = ContaoFramework::class;
-
-        return $services;
     }
 
     /**
      * @throws \Exception
      */
-    protected function getResponse(Template $template, ModuleModel $model, Request $request): Response|null
+    protected function getResponse(Template $template, ModuleModel $model, Request $request): Response
     {
-        /** @var Database $databaseAdapter */
-        $databaseAdapter = $this->get('contao.framework')->getAdapter(Database::class);
+        $databaseAdapter = $this->framework->getAdapter(Database::class);
+        $validatorAdapter = $this->framework->getAdapter(Validator::class);
+        $filesModelAdapter = $this->framework->getAdapter(FilesModel::class);
+        $rszSteckbriefModel = $this->framework->getAdapter(RszSteckbriefModel::class);
 
-        /** @var Validator $validatorAdapter */
-        $validatorAdapter = $this->get('contao.framework')->getAdapter(Validator::class);
-
-        /** @var FilesModel $filesModelAdapter */
-        $filesModelAdapter = $this->get('contao.framework')->getAdapter(FilesModel::class);
-
-        /** @var RszSteckbriefModel $rszSteckbriefModel */
-        $rszSteckbriefModel = $this->get('contao.framework')->getAdapter(RszSteckbriefModel::class);
-
-        // Die ganze Tabelle
         $objJumpTo = PageModel::findByPk($model->rszSteckbriefReaderPage);
 
         $portraits = [];
@@ -171,7 +134,7 @@ class RszSteckbriefListingModuleController extends AbstractFrontendModuleControl
         return $template->getResponse();
     }
 
-    protected function isAthlete(UserModel $objUser): bool
+    private function isAthlete(UserModel $objUser): bool
     {
         $arrFunktionen = StringUtil::deserialize($objUser->funktion, true);
 
