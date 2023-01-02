@@ -16,9 +16,6 @@ namespace Markocupic\RszSteckbriefBundle\Model;
 
 use Contao\Model;
 
-/**
- * Class RszSteckbriefModel.
- */
 class RszSteckbriefModel extends Model
 {
     protected static $strTable = 'tl_rsz_steckbrief';

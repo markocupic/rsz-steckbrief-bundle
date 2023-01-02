@@ -1,0 +1,21 @@
+{% extends '@Contao/block_searchable' %}
+
+{% block content %}
+    <div class="row">
+        {% for portrait in portraits %}
+            <div class="col-6 col-lg-4">
+                {% if portrait.href %}
+                <a href="{{ portrait.href }}" title="Portrait von {{ portrait.user_model.name }}">
+                    {% endif %}
+                    <figure class="figure image_container w-100">
+                        {{ '{{image::'~portrait.src~'?width=500&height=500&mode=center_center&class=img-fluid w-100}}'|raw }}
+                        <figcaption class="ms-1 mt-2 mb-3 figure-caption">{{ portrait.user_model.name }}</figcaption>
+                    </figure>
+                    {% if portrait.href %}
+                </a>
+                {% endif %}
+            </div>
+        {% endfor %}
+    </div>
+    {{ parent() }}
+{% endblock %}

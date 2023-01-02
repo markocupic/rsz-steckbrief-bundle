@@ -100,7 +100,7 @@ $GLOBALS['TL_DCA']['tl_rsz_steckbrief'] = [
         'multiSRC'                       => [
             'exclude'   => true,
             'inputType' => 'fileTree',
-            'eval'      => ['multiple' => true, 'filesOnly' => true, 'extensions' => 'jpg,jpeg,png', 'files' => true, 'fieldType' => 'checkbox', 'orderField' => 'orderSRC'],
+            'eval'      => ['isGallery' => true, 'multiple' => true, 'filesOnly' => true, 'extensions' => 'jpg,jpeg,png', 'files' => true, 'fieldType' => 'checkbox', 'orderField' => 'orderSRC'],
             'sql'       => 'blob NULL',
         ],
         'orderSRC'                       => [

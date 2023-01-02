@@ -1,0 +1,85 @@
+{% extends '@Contao/block_searchable' %}
+
+{% block content %}
+
+    <div class="text-right mb-4">{{ '{{link::back}}'|raw }}</div>
+
+    <h1>{{ user_model.name }}</h1>
+
+    {% if arr_images is not empty %}
+        <ul class="row">
+            {% for image in arr_images %}
+                <li class="col-12 col-sm-6 col-md-4 col-lg-3 mb-4">
+                    <figure class="image_container">
+                        <a href="{{ image.imageSrc|url_encode }}" data-lightbox="data-lightbox" data-gallery="data-lightbox" title="{{ image.caption }}">
+                            {{ '{{image::'~image.imageSrc~'?mode=crop&width=700&height=700}}'|raw }}
+                        </a>
+                    </figure>
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    <h2>About {{ user_model.name }}</h2>
+
+    <table class="table">
+
+        {% if user_model.city is defined and user_model.city is not empty %}
+            <tr>
+                <td class="description"><strong>Wohnort:</strong></td>
+                <td>{{ user_model.city }}</td>
+            </tr>
+        {% endif %}
+
+        {% set fields = ['hobbies', 'klettert_seit', 'best_competition_results', 'schwerste_rotpunktroute_indoor', 'schwerste_boulderroute_indoor'] %}
+
+        {% for fieldname in fields %}
+            {% if _context[fieldname] is defined and _context[fieldname] is not empty %}
+                <tr>
+                    <td class="description"><strong>{{ '{{label::tl_rsz_steckbrief:'~fieldname~':0}}' }}:</strong></td>
+                    <td>{{ _context[fieldname]|nl2br }}</td>
+                </tr>
+            {% endif %}
+        {% endfor %}
+
+        {% if schwerste_route_gebiet is defined and schwerste_route_gebiet is not empty %}
+            <tr>
+                <td class="description"><strong>Schwerste Route outdoor (rotpunkt): </strong></td>
+                <td>{{ schwerste_route_gebiet }}, {{ schwerste_route_routenname }} {{ schwerste_route_difficulty }}</td>
+            </tr>
+        {% endif %}
+
+        {% if schwerster_boulder_gebiet is defined and schwerster_boulder_gebiet is not empty %}
+            <tr>
+                <td class="description"><strong>Schwerster Boulder outdoor: </strong></td>
+                <td>{{ schwerster_boulder_gebiet }}, {{ schwerster_boulder_routenname }} {{ schwerster_boulder_difficulty }}</td>
+            </tr>
+        {% endif %}
+
+        {% set fields = ['lieblingsklettergebiet', 'sponsoren', 'ziele', 'leitsatz'] %}
+
+        {% for fieldname in fields %}
+            {% if _context[fieldname] is defined and _context[fieldname] is not empty %}
+                <tr>
+                    <td class="description"><strong>{{ '{{label::tl_rsz_steckbrief:'~fieldname~':0}}' }}:</strong></td>
+                    <td>{{ _context[fieldname]|nl2br }}</td>
+                </tr>
+            {% endif %}
+        {% endfor %}
+
+    </table>
+
+    {% if arr_videos is defined and arr_videos is not empty %}
+        <div class="row">
+            {% for video in arr_videos %}
+                <div class="col-12 col-md-6 mt-4 mb-3">
+                    {{ '{{bootstrapResponsiveYoutubeEmbed::'~video~'?autoplay=1&playerAspectRatio=4x3}}'|raw }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <p class="last_update mb-5">[last update: {{ tstamp|date('l, d. F Y') }}]</p>
+
+    {{ parent() }}
+{% endblock %}

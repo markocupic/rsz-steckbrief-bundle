@@ -29,7 +29,7 @@ use Markocupic\RszSteckbriefBundle\Model\RszSteckbriefModel;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-#[AsFrontendModule(self::TYPE, category:'rsz_frontend_modules', template: 'mod_rsz_steckbrief_listing')]
+#[AsFrontendModule(RszSteckbriefListingModuleController::TYPE, category:'rsz_frontend_modules', template: 'mod_rsz_steckbrief_listing')]
 class RszSteckbriefListingModuleController extends AbstractFrontendModuleController
 {
     public const TYPE = 'rsz_steckbrief_listing_module';
@@ -119,7 +119,7 @@ class RszSteckbriefListingModuleController extends AbstractFrontendModuleControl
                         'id' => $objSteckbrief->id,
                         'pid' => $objSteckbrief->pid,
                         'src' => FilesModel::findByUuid($image['uuid'])->path,
-                        'userModel' => $objUser,
+                        'user_model' => $objUser,
                         'href' => $objJumpTo ? $objJumpTo->getFrontendUrl('/'.$objUser->username) : null,
                     ];
                 }

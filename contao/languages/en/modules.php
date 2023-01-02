@@ -12,6 +12,9 @@ declare(strict_types=1);
  * @link https://github.com/markocupic/rsz-steckbrief-bundle
  */
 
+use Markocupic\RszSteckbriefBundle\Controller\FrontendModule\RszSteckbriefListingModuleController;
+use Markocupic\RszSteckbriefBundle\Controller\FrontendModule\RszSteckbriefReaderModuleController;
+
 /*
  * Backend modules
  */
@@ -22,5 +25,5 @@ $GLOBALS['TL_LANG']['MOD']['rsz_steckbrief'] = ['RSZ Steckbrief', 'Steckbrief-Mo
  * Frontend modules
  */
 $GLOBALS['TL_LANG']['FMD']['rsz_frontend_modules'] = 'RSZ Frontend Module';
-$GLOBALS['TL_LANG']['FMD']['rsz_steckbrief_listing_module'] = ['RSZ Steckbrief Liste', 'Fügen Sie der Seite eine RSZ Steckbrief Liste hinzu.'];
-$GLOBALS['TL_LANG']['FMD']['rsz_steckbrief_reader_module'] = ['RSZ Steckbrief Reader', 'Fügen Sie der Seite einen RSZ Reader hinzu.'];
+$GLOBALS['TL_LANG']['FMD'][RszSteckbriefListingModuleController::TYPE] = ['RSZ Steckbrief Liste', 'Fügen Sie der Seite eine RSZ Steckbrief Liste hinzu.'];
+$GLOBALS['TL_LANG']['FMD'][RszSteckbriefReaderModuleController::TYPE] = ['RSZ Steckbrief Reader', 'Fügen Sie der Seite einen RSZ Steckbrief Reader hinzu.'];
