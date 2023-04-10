@@ -12,8 +12,6 @@ declare(strict_types=1);
  * @link https://github.com/markocupic/rsz-steckbrief-bundle
  */
 
-
-
 use Markocupic\RszSteckbriefBundle\Controller\FrontendModule\RszSteckbriefListingModuleController;
 use Markocupic\RszSteckbriefBundle\Controller\FrontendModule\RszSteckbriefReaderModuleController;
 
@@ -27,10 +25,10 @@ $GLOBALS['TL_DCA']['tl_module']['palettes'][RszSteckbriefReaderModuleController:
  * Fields
  */
 $GLOBALS['TL_DCA']['tl_module']['fields']['rszSteckbriefReaderPage'] = [
-    'exclude' => true,
-    'inputType' => 'pageTree',
+    'exclude'    => true,
+    'inputType'  => 'pageTree',
     'foreignKey' => 'tl_page.title',
-    'eval' => ['fieldType' => 'radio', 'tl_class' => 'clr'],
-    'sql' => 'int(10) unsigned NOT NULL default 0',
-    'relation' => ['type' => 'hasOne', 'load' => 'lazy'],
+    'eval'       => ['fieldType' => 'radio', 'tl_class' => 'clr'],
+    'sql'        => 'int(10) unsigned NOT NULL default 0',
+    'relation'   => ['type' => 'hasOne', 'load' => 'lazy'],
 ];

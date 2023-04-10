@@ -14,6 +14,8 @@ declare(strict_types=1);
 
 namespace Markocupic\RszSteckbriefBundle;
 
+use Markocupic\RszSteckbriefBundle\DependencyInjection\MarkocupicRszSteckbriefExtension;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 class MarkocupicRszSteckbriefBundle extends Bundle
@@ -21,5 +23,18 @@ class MarkocupicRszSteckbriefBundle extends Bundle
     public function getPath(): string
     {
         return \dirname(__DIR__);
+    }
+    public function getContainerExtension(): MarkocupicRszSteckbriefExtension
+    {
+        // Set alias rsz_steckbrief
+        return new MarkocupicRszSteckbriefExtension();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function build(ContainerBuilder $container): void
+    {
+        parent::build($container);
     }
 }

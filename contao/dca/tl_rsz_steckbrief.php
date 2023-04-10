@@ -12,21 +12,15 @@ declare(strict_types=1);
  * @link https://github.com/markocupic/rsz-steckbrief-bundle
  */
 
-use Contao\BackendUser;
+use Contao\System;
 use Contao\DataContainer;
-use Contao\UserModel;
 use Contao\DC_Table;
 
 $GLOBALS['TL_DCA']['tl_rsz_steckbrief'] = [
-    // Config
     'config'   => [
         'ptable'           => 'tl_user',
         'dataContainer'    => DC_Table::class,
         'enableVersioning' => true,
-        'onload_callback'  => [
-            ['tl_rsz_steckbrief', 'createProfiles'],
-            ['tl_rsz_steckbrief', 'filterList'],
-        ],
         'notDeletable'     => true,
         'notCopyable'      => true,
         'notSortable'      => true,
@@ -38,19 +32,17 @@ $GLOBALS['TL_DCA']['tl_rsz_steckbrief'] = [
             ],
         ],
     ],
-    // List
     'list'     => [
         'sorting'           => [
             'mode'            => DataContainer::MODE_SORTED,
             // Do not permit access to foreign profiles (except admins)
-            'filter'          => [['pid=?', BackendUser::getInstance()->id]],
+            'filter'          => [['pid = ?', System::getContainer()->get('security.helper')->getUser() ? System::getContainer()->get('security.helper')->getUser()->id : null]],
             'fields'          => ['pid'],
             'flag'            => DataContainer::SORT_INITIAL_LETTER_ASC,
             'disableGrouping' => true,
         ],
         'label'             => [
-            'fields'         => ['pid'],
-            'label_callback' => ['tl_rsz_steckbrief', 'labelCallback'],
+            'fields' => ['pid'],
         ],
         'global_operations' => [
             'all' => [
@@ -62,23 +54,27 @@ $GLOBALS['TL_DCA']['tl_rsz_steckbrief'] = [
         ],
         'operations'        => [
             'edit'   => [
-                'label' => &$GLOBALS['TL_LANG']['tl_rsz_steckbrief']['edit'],
-                'href'  => 'act=edit',
-                'icon'  => 'edit.gif',
+                'href' => 'act=edit',
+                'icon' => 'edit.gif',
             ],
             'delete' => [
-                'label'      => &$GLOBALS['TL_LANG']['tl_rsz_steckbrief']['delete'],
                 'href'       => 'act=delete',
                 'icon'       => 'delete.gif',
-                'attributes' => 'onclick="if (!confirm(\''.$GLOBALS['TL_LANG']['MSC']['deleteConfirm'].'\')) return false; Backend.getScrollOffset();"',
+                'attributes' => 'onclick="if(!confirm(\''.($GLOBALS['TL_LANG']['MSC']['deleteConfirm'] ?? null).'\'))return false;Backend.getScrollOffset()"',
             ],
         ],
     ],
-    // Palettes
     'palettes' => [
-        'default' => '{publish_legend},aktiv;{gallery},multiSRC,image_description,video_integration;{competitions},klettert_seit,best_competition_results;{indoorleistungen},schwerste_rotpunktroute_indoor,schwerste_boulderroute_indoor; {outdoorleistungen_routen},schwerste_route_gebiet,schwerste_route_routenname,schwerste_route_difficulty;{outdoorleistungen_boulders},schwerster_boulder_gebiet,schwerster_boulder_routenname,schwerster_boulder_difficulty;{allgemeines},lieblingsklettergebiet,sponsoren,ziele,leitsatz,hobbies',
+        'default' => '
+        {publish_legend},aktiv;
+        {gallery},multiSRC,image_description,video_integration;
+        {competitions},klettert_seit,best_competition_results;
+        {indoorleistungen},schwerste_rotpunktroute_indoor,schwerste_boulderroute_indoor;
+        {outdoorleistungen_routen},schwerste_route_gebiet,schwerste_route_routenname,schwerste_route_difficulty;
+        {outdoorleistungen_boulders},schwerster_boulder_gebiet,schwerster_boulder_routenname,schwerster_boulder_difficulty;
+        {allgemeines},lieblingsklettergebiet,sponsoren,ziele,leitsatz,hobbies
+        ',
     ],
-    // Fields
     'fields'   => [
         'id'                             => [
             'sql' => 'int(10) unsigned NOT NULL auto_increment',
@@ -212,62 +208,3 @@ $GLOBALS['TL_DCA']['tl_rsz_steckbrief'] = [
         ],
     ],
 ];
-
-class tl_rsz_steckbrief extends Backend
-{
-    /**
-     * Onload callback.
-     */
-    public function filterList(): void
-    {
-        // Nur Admins haben Zugriff auf fremde Profile
-        $this->import('BackendUser', 'User');
-
-        if ($this->User->isAdmin) {
-            unset($GLOBALS['TL_DCA']['tl_rsz_steckbrief']['list']['sorting']['filter']);
-        }
-    }
-
-    /**
-     * Onload callback
-     * Create profiles.
-     */
-    public function createProfiles(): void
-    {
-        // Create a blanko profile if not exists.
-        $objUser = $this->Database
-            ->execute('SELECT id, username FROM tl_user');
-
-        while ($objUser->next()) {
-            $objSteckbriefe = $this->Database
-                ->prepare('SELECT * FROM tl_rsz_steckbrief WHERE pid=?')
-                ->execute($objUser->id);
-
-            if (!$objSteckbriefe->numRows) {
-                $set = [
-                    'pid' => $objUser->id,
-                ];
-
-                $objSteckbriefe = $this->Database
-                    ->prepare('INSERT INTO  tl_rsz_steckbrief %s')
-                    ->set($set)
-                    ->execute($objUser->id);
-
-                if ($objSteckbriefe->affectedRows) {
-                    $insertID = $objSteckbriefe->insertId;
-                    $this->log('A new entry in table "tl_rsz_steckbrief" has been created (ID: '.$insertID.')', self::class.' '.__FUNCTION__.'()', TL_GENERAL);
-                }
-            }
-        }
-    }
-
-    /**
-     * Replace the pid with tl_user.name.
-     */
-    public function labelCallback(array $row, string $label, DataContainer $dc, array $args): array
-    {
-        $args[0] = null !== UserModel::findByPk($args[0]) ? UserModel::findByPk($args[0])->name : 'Unbekannt';
-
-        return $args;
-    }
-}

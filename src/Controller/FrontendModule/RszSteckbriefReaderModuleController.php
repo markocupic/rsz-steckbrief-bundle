@@ -5,7 +5,7 @@ declare(strict_types=1);
 /*
  * This file is part of RSZ Steckbrief Bundle.
 *
- * (c) Marko Cupic 2020 <m.cupic@gmx.ch>
+ * (c) Marko Cupic 2023 <m.cupic@gmx.ch>
  * @license MIT
  * For the full copyright and license information,
  * please view the LICENSE file that was distributed with this source code.
@@ -15,7 +15,6 @@ declare(strict_types=1);
 namespace Markocupic\RszSteckbriefBundle\Controller\FrontendModule;
 
 use Contao\Config;
-use Contao\Controller;
 use Contao\CoreBundle\Controller\FrontendModule\AbstractFrontendModuleController;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsFrontendModule;
 use Contao\CoreBundle\Exception\PageNotFoundException;
@@ -27,7 +26,6 @@ use Contao\Input;
 use Contao\ModuleModel;
 use Contao\PageModel;
 use Contao\StringUtil;
-use Contao\System;
 use Contao\Template;
 use Contao\UserModel;
 use Markocupic\RszSteckbriefBundle\Model\RszSteckbriefModel;
@@ -138,6 +136,7 @@ class RszSteckbriefReaderModuleController extends AbstractFrontendModuleControll
                     }
                     $arrImage['uuid'] = $filesModel->uuid;
                     $arrImage['imageSrc'] = $filesModel->path;
+                    $arrImage['caption'] = '';
                     $images[$filesModel->path] = $arrImage;
                 }
             }

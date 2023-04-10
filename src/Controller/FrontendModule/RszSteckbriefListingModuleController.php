@@ -17,7 +17,6 @@ namespace Markocupic\RszSteckbriefBundle\Controller\FrontendModule;
 use Contao\CoreBundle\Controller\FrontendModule\AbstractFrontendModuleController;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsFrontendModule;
 use Contao\CoreBundle\Framework\ContaoFramework;
-use Contao\Database;
 use Contao\FilesModel;
 use Contao\ModuleModel;
 use Contao\PageModel;
@@ -25,6 +24,7 @@ use Contao\StringUtil;
 use Contao\Template;
 use Contao\UserModel;
 use Contao\Validator;
+use Doctrine\DBAL\Connection;
 use Markocupic\RszSteckbriefBundle\Model\RszSteckbriefModel;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -33,13 +33,12 @@ use Symfony\Component\HttpFoundation\Response;
 class RszSteckbriefListingModuleController extends AbstractFrontendModuleController
 {
     public const TYPE = 'rsz_steckbrief_listing_module';
-    private ContaoFramework $framework;
-    private string $projectDir;
 
-    public function __construct(ContaoFramework $framework, string $projectDir)
-    {
-        $this->framework = $framework;
-        $this->projectDir = $projectDir;
+    public function __construct(
+        private readonly ContaoFramework $framework,
+        private readonly Connection $connection,
+        private readonly string $projectDir,
+    ) {
     }
 
     /**
@@ -47,23 +46,20 @@ class RszSteckbriefListingModuleController extends AbstractFrontendModuleControl
      */
     protected function getResponse(Template $template, ModuleModel $model, Request $request): Response
     {
-        $databaseAdapter = $this->framework->getAdapter(Database::class);
-        $validatorAdapter = $this->framework->getAdapter(Validator::class);
-        $filesModelAdapter = $this->framework->getAdapter(FilesModel::class);
-        $rszSteckbriefModel = $this->framework->getAdapter(RszSteckbriefModel::class);
+        $validator = $this->framework->getAdapter(Validator::class);
+        $filesModel = $this->framework->getAdapter(FilesModel::class);
+        $rszSteckbrief = $this->framework->getAdapter(RszSteckbriefModel::class);
+        $pageModel = $this->framework->getAdapter(PageModel::class);
 
-        $objJumpTo = PageModel::findByPk($model->rszSteckbriefReaderPage);
+        $objJumpTo = $pageModel->findByPk($model->rszSteckbriefReaderPage);
 
         $portraits = [];
 
-        $objSteckbrief = $databaseAdapter->getInstance()
-            ->prepare("SELECT * FROM tl_rsz_steckbrief WHERE multiSRC != ''")
-            ->execute()
-        ;
+        $result = $this->connection->executeQuery("SELECT * FROM tl_rsz_steckbrief WHERE multiSRC != ''");
 
-        while ($objSteckbrief->next()) {
+        while (false !== ($profile = $result->fetchAssociative())) {
             /** @var UserModel $objUser */
-            if (null === ($objUser = $rszSteckbriefModel->findByPk($objSteckbrief->id)->getRelated('pid'))) {
+            if (null === ($objUser = $rszSteckbrief->findByPk($profile['id'])->getRelated('pid'))) {
                 continue;
             }
 
@@ -71,21 +67,21 @@ class RszSteckbriefListingModuleController extends AbstractFrontendModuleControl
                 continue;
             }
 
-            $objSteckbrief->multiSRC = unserialize($objSteckbrief->multiSRC);
+            $profile['multiSRC'] = unserialize($profile['multiSRC']);
 
-            if (!empty($objSteckbrief->multiSRC) && \is_array($objSteckbrief->multiSRC)) {
-                if (null !== ($objFiles = $filesModelAdapter->findMultipleByUuids($objSteckbrief->multiSRC))) {
+            if (!empty($profile['multiSRC']) && \is_array($profile['multiSRC'])) {
+                if (null !== ($objFiles = $filesModel->findMultipleByUuids($profile['multiSRC']))) {
                     $images = [];
 
                     while ($objFiles->next()) {
-                        if ($validatorAdapter->isUuid($objFiles->uuid) && is_file($this->projectDir.'/'.$objFiles->path)) {
+                        if ($validator->isUuid($objFiles->uuid) && is_file($this->projectDir.'/'.$objFiles->path)) {
                             $images[] = ['uuid' => $objFiles->uuid];
                         }
                     }
 
                     // Custom order
-                    if (!empty($objSteckbrief->orderSRC) && \is_array(unserialize($objSteckbrief->orderSRC))) {
-                        $tmp = unserialize($objSteckbrief->orderSRC);
+                    if (!empty($profile['orderSRC']) && \is_array(unserialize($profile['orderSRC']))) {
+                        $tmp = unserialize($profile['orderSRC']);
 
                         // Remove all values
                         $arrOrder = array_map(
@@ -116,9 +112,9 @@ class RszSteckbriefListingModuleController extends AbstractFrontendModuleControl
                     $image = $images[0];
 
                     $portraits[] = [
-                        'id' => $objSteckbrief->id,
-                        'pid' => $objSteckbrief->pid,
-                        'src' => FilesModel::findByUuid($image['uuid'])->path,
+                        'id' => $profile['id'],
+                        'pid' => $profile['pid'],
+                        'src' => $filesModel->findByUuid($image['uuid'])->path,
                         'user_model' => $objUser,
                         'href' => $objJumpTo ? $objJumpTo->getFrontendUrl('/'.$objUser->username) : null,
                     ];
@@ -136,7 +132,8 @@ class RszSteckbriefListingModuleController extends AbstractFrontendModuleControl
 
     private function isAthlete(UserModel $objUser): bool
     {
-        $arrFunktionen = StringUtil::deserialize($objUser->funktion, true);
+        $stringUtil = $this->framework->getAdapter(StringUtil::class);
+        $arrFunktionen = $stringUtil->deserialize($objUser->funktion, true);
 
         if (\in_array('Athlet', $arrFunktionen, true)) {
             return true;
