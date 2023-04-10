@@ -24,6 +24,7 @@ class MarkocupicRszSteckbriefBundle extends Bundle
     {
         return \dirname(__DIR__);
     }
+    
     public function getContainerExtension(): MarkocupicRszSteckbriefExtension
     {
         // Set alias rsz_steckbrief
