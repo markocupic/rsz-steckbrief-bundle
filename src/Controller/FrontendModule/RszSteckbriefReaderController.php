@@ -14,29 +14,28 @@ declare(strict_types=1);
 
 namespace Markocupic\RszSteckbriefBundle\Controller\FrontendModule;
 
-use Contao\Config;
 use Contao\CoreBundle\Controller\FrontendModule\AbstractFrontendModuleController;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsFrontendModule;
 use Contao\CoreBundle\Exception\PageNotFoundException;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\Routing\ScopeMatcher;
+use Contao\CoreBundle\Twig\FragmentTemplate;
 use Contao\Environment;
 use Contao\FilesModel;
 use Contao\Input;
 use Contao\ModuleModel;
 use Contao\PageModel;
 use Contao\StringUtil;
-use Contao\Template;
 use Contao\UserModel;
 use Markocupic\RszSteckbriefBundle\Model\RszSteckbriefModel;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 
-#[AsFrontendModule(RszSteckbriefReaderModuleController::TYPE, category:'rsz_frontend_modules', template: 'mod_rsz_steckbrief_reader')]
-class RszSteckbriefReaderModuleController extends AbstractFrontendModuleController
+#[AsFrontendModule(RszSteckbriefReaderController::TYPE, category:'rsz_frontend_modules')]
+class RszSteckbriefReaderController extends AbstractFrontendModuleController
 {
-    public const TYPE = 'rsz_steckbrief_reader_module';
+    public const TYPE = 'rsz_steckbrief_reader';
 
     private ContaoFramework $framework;
     private RequestStack $requestStack;
@@ -61,7 +60,6 @@ class RszSteckbriefReaderModuleController extends AbstractFrontendModuleControll
     public function __invoke(Request $request, ModuleModel $model, string $section, array $classes = null, PageModel $page = null): Response
     {
         $inputAdapter = $this->framework->getAdapter(Input::class);
-        $configAdapter = $this->framework->getAdapter(Config::class);
         $userModelAdapter = $this->framework->getAdapter(UserModel::class);
         $rszSteckbriefModelAdapter = $this->framework->getAdapter(RszSteckbriefModel::class);
         $environmentAdapter = $this->framework->getAdapter(Environment::class);
@@ -69,18 +67,11 @@ class RszSteckbriefReaderModuleController extends AbstractFrontendModuleControll
         if ($this->scopeMatcher->isFrontendRequest($this->requestStack->getCurrentRequest())) {
             $blnShow = false;
 
-            // Set the item from the auto_item parameter
-            if (!isset($_GET['person']) && $configAdapter->get('useAutoItem') && isset($_GET['auto_item'])) {
-                $inputAdapter->setGet('person', $inputAdapter->get('auto_item'));
-            }
+            $objUser = $userModelAdapter->findByUsername($inputAdapter->get('auto_item'));
 
-            if ('' !== $inputAdapter->get('person')) {
-                $objUser = $userModelAdapter->findByUsername($inputAdapter->get('person'));
-
-                if (null !== $objUser) {
-                    if (null !== ($this->objRszSteckbrief = $rszSteckbriefModelAdapter->findOneByPid($objUser->id))) {
-                        $blnShow = true;
-                    }
+            if (null !== $objUser) {
+                if (null !== ($this->objRszSteckbrief = $rszSteckbriefModelAdapter->findOneByPid($objUser->id))) {
+                    $blnShow = true;
                 }
             }
 
@@ -95,26 +86,26 @@ class RszSteckbriefReaderModuleController extends AbstractFrontendModuleControll
     /**
      * @throws \Exception
      */
-    protected function getResponse(Template $template, ModuleModel $model, Request $request): Response
+    protected function getResponse(FragmentTemplate $template, ModuleModel $model, Request $request): Response
     {
         $filesModelAdapter = $this->framework->getAdapter(FilesModel::class);
         $stringUtilAdapter = $this->framework->getAdapter(StringUtil::class);
 
         // Get user model and add it to the template
         $objUser = $this->objRszSteckbrief->getRelated('pid');
-        $template->user_model = $objUser->row();
+        $template->set('user_model', $objUser->row());
 
         $arrSteckbrief = $this->objRszSteckbrief->row();
 
         foreach ($arrSteckbrief as $key => $content) {
-            $template->{$key} = stripslashes((string) $content);
+            $template->set($key, stripslashes((string) $content));
         }
 
         // Youtube videos
-        $template->arr_videos = [];
+        $template->set('arr_videos', []);
 
         if (!empty($arrSteckbrief['video_integration'])) {
-            $template->arr_videos = array_values(explode(',', $arrSteckbrief['video_integration']));
+            $template->set('arr_videos', array_values(explode(',', $arrSteckbrief['video_integration'])));
         }
 
         // Images
@@ -182,7 +173,7 @@ class RszSteckbriefReaderModuleController extends AbstractFrontendModuleControll
             }
         }
 
-        $template->arr_images = $images;
+        $template->set('arr_images', $images);
 
         return $template->getResponse();
     }

@@ -25,8 +25,3 @@ $GLOBALS['BE_MOD']['rsz_tools']['rsz_steckbrief'] = [
  * Models
  */
 $GLOBALS['TL_MODELS']['tl_rsz_steckbrief'] = RszSteckbriefModel::class;
-
-/*
- * Register the auto_item keywords
- */
-$GLOBALS['TL_AUTO_ITEM'][] = 'person';

@@ -12,14 +12,14 @@ declare(strict_types=1);
  * @link https://github.com/markocupic/rsz-steckbrief-bundle
  */
 
-use Markocupic\RszSteckbriefBundle\Controller\FrontendModule\RszSteckbriefListingModuleController;
-use Markocupic\RszSteckbriefBundle\Controller\FrontendModule\RszSteckbriefReaderModuleController;
+use Markocupic\RszSteckbriefBundle\Controller\FrontendModule\RszSteckbriefListingController;
+use Markocupic\RszSteckbriefBundle\Controller\FrontendModule\RszSteckbriefReaderController;
 
 /*
  * Frontend modules
  */
-$GLOBALS['TL_DCA']['tl_module']['palettes'][RszSteckbriefListingModuleController::TYPE] = '{title_legend},name,headline,type;{config_legend},rszSteckbriefReaderPage,numberOfItems;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID';
-$GLOBALS['TL_DCA']['tl_module']['palettes'][RszSteckbriefReaderModuleController::TYPE] = '{title_legend},name,headline,type;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID';
+$GLOBALS['TL_DCA']['tl_module']['palettes'][RszSteckbriefListingController::TYPE] = '{title_legend},name,headline,type;{config_legend},rszSteckbriefReaderPage,numberOfItems;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID';
+$GLOBALS['TL_DCA']['tl_module']['palettes'][RszSteckbriefReaderController::TYPE] = '{title_legend},name,headline,type;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID';
 
 /*
  * Fields

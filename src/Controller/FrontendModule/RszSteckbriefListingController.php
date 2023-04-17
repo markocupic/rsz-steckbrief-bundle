@@ -17,11 +17,11 @@ namespace Markocupic\RszSteckbriefBundle\Controller\FrontendModule;
 use Contao\CoreBundle\Controller\FrontendModule\AbstractFrontendModuleController;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsFrontendModule;
 use Contao\CoreBundle\Framework\ContaoFramework;
+use Contao\CoreBundle\Twig\FragmentTemplate;
 use Contao\FilesModel;
 use Contao\ModuleModel;
 use Contao\PageModel;
 use Contao\StringUtil;
-use Contao\Template;
 use Contao\UserModel;
 use Contao\Validator;
 use Doctrine\DBAL\Connection;
@@ -29,10 +29,10 @@ use Markocupic\RszSteckbriefBundle\Model\RszSteckbriefModel;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-#[AsFrontendModule(RszSteckbriefListingModuleController::TYPE, category:'rsz_frontend_modules', template: 'mod_rsz_steckbrief_listing')]
-class RszSteckbriefListingModuleController extends AbstractFrontendModuleController
+#[AsFrontendModule(RszSteckbriefListingController::TYPE, category:'rsz_frontend_modules')]
+class RszSteckbriefListingController extends AbstractFrontendModuleController
 {
-    public const TYPE = 'rsz_steckbrief_listing_module';
+    public const TYPE = 'rsz_steckbrief_listing';
 
     public function __construct(
         private readonly ContaoFramework $framework,
@@ -44,7 +44,7 @@ class RszSteckbriefListingModuleController extends AbstractFrontendModuleControl
     /**
      * @throws \Exception
      */
-    protected function getResponse(Template $template, ModuleModel $model, Request $request): Response
+    protected function getResponse(FragmentTemplate $template, ModuleModel $model, Request $request): Response
     {
         $validator = $this->framework->getAdapter(Validator::class);
         $filesModel = $this->framework->getAdapter(FilesModel::class);
@@ -125,7 +125,7 @@ class RszSteckbriefListingModuleController extends AbstractFrontendModuleControl
         // Random order
         shuffle($portraits);
 
-        $template->portraits = $portraits;
+        $template->set('portraits', $portraits);
 
         return $template->getResponse();
     }
