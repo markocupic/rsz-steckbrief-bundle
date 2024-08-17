@@ -21,7 +21,7 @@ use Contao\DataContainer;
 use Contao\UserModel;
 use Doctrine\DBAL\Connection;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\Security\Core\Security;
+use Symfony\Bundle\SecurityBundle\Security;
 
 class RszSteckbrief
 {
