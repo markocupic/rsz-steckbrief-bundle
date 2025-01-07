@@ -5,7 +5,7 @@ declare(strict_types=1);
 /*
  * This file is part of RSZ Steckbrief Bundle.
  *
- * (c) Marko Cupic 2023 <m.cupic@gmx.ch>
+ * (c) Marko Cupic <m.cupic@gmx.ch>
  * @license MIT
  * For the full copyright and license information,
  * please view the LICENSE file that was distributed with this source code.
@@ -68,13 +68,13 @@ class RszSteckbrief
     }
 
     /**
-     * Replace the pid with tl_user.name.
+     * Replace the username with tl_user.name.
      */
     #[AsCallback(table: 'tl_rsz_steckbrief', target: 'list.label.label', priority: 100)]
     public function labelCallback(array $row, string $label, DataContainer $dc, array $args): array
     {
         $userModel = $this->framework->getAdapter(UserModel::class);
-        $args[0] = null !== $userModel->findByPk($args[0]) ? $userModel->findByPk($args[0])->name : 'Unbekannt';
+        $args[0] = null !== $userModel->findByUsername($args[0]) ? $userModel->findByUsername($args[0])->name : 'Unbekannt';
 
         return $args;
     }

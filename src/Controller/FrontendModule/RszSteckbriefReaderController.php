@@ -5,7 +5,7 @@ declare(strict_types=1);
 /*
  * This file is part of RSZ Steckbrief Bundle.
 *
- * (c) Marko Cupic 2023 <m.cupic@gmx.ch>
+ * (c) Marko Cupic <m.cupic@gmx.ch>
  * @license MIT
  * For the full copyright and license information,
  * please view the LICENSE file that was distributed with this source code.
@@ -57,7 +57,7 @@ class RszSteckbriefReaderController extends AbstractFrontendModuleController
      * This method extends the parent __invoke method,
      * its usage is usually not necessary.
      */
-    public function __invoke(Request $request, ModuleModel $model, string $section, array $classes = null, PageModel $page = null): Response
+    public function __invoke(Request $request, ModuleModel $model, string $section, array|null $classes = null, PageModel|null $page = null): Response
     {
         $inputAdapter = $this->framework->getAdapter(Input::class);
         $userModelAdapter = $this->framework->getAdapter(UserModel::class);
